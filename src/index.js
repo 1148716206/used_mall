@@ -3,10 +3,29 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Provider } from "react-redux";
+import store from "./store";
+import decode from 'jwt-decode';
+import { syncInfoAc } from './pages/login/store/actionCreators'
+
+const token = localStorage.getItem('@#@TOKEN');
+//解析 TOKEN 并同步到 Redux
+if (token) {
+  try {
+    store.dispatch(syncInfoAc(decode(token)))
+  } catch {
+    localStorage.removeItem('@#@TOKEN');
+    window.location.href = '/login';
+  }
+}
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
+
   </React.StrictMode>,
   document.getElementById('root')
 );
