@@ -17,17 +17,23 @@ import Auth from './utils/auth'
 
 
 export default class App extends Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			...this.props.store.getState()
+		} 
+	}
 	render() {
 		let AuthCart = Auth(<Cart/>)
 		return (
 			<Router>
         <Navigator/>
 				<Routes>
-					<Route path="/" exact element={<Home/>} />
-					<Route path="/cart" exact element={<Cart/>} />
-					<Route path="/personal" exact element={<Personal/>} />
-					<Route path="/login" element={<Login/>} />
-					<Route path="/register" element={<Register/>} />
+					<Route path="/" data={this.state} exact element={<Home/>} />
+					<Route path="/cart" data={this.state} exact element={<Cart/>} />
+					<Route path="/personal" data={this.state} exact element={<Personal/>} />
+					<Route path="/login" data={this.state} element={<Login/>} />
+					<Route path="/register" data={this.state} element={<Register/>} />
 				</Routes>
 			</Router>
 		);

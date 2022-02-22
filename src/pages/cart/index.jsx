@@ -22,7 +22,7 @@ const Cart = () => {
   }
   const getUser = async() => {
     const {data} = await axios.post('/api/cart')
-    console.log('data',data);
+
   }
   useEffect(() => {
     getUser()

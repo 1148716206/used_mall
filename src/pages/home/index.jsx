@@ -7,11 +7,13 @@ import { SearchOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { actionCreators as getGoodsInfoActionCreators } from './store';
+
 // 导航
 import Navigator from '../navigator';
 
 const { Dragger } = Upload;
 const Home = props => {
+
 	const [editShow, setEditShow] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [managerInfoModal, setManagerInfoModal] = useState({ avatar: '' });
@@ -23,7 +25,6 @@ const Home = props => {
 	const getGoodsList = async () => {
 
 		const {data} = await goodsInfoFn.getGoodsInfo()
-		console.log('data', data.data)
 		setGoodsList(data.data)
 	};
 
@@ -131,12 +132,13 @@ const Home = props => {
 						</div>
 						<div className={styles.recommend__list}>
 							{goodsList
-								? goodsList.map((item) => (
+								? goodsList.map((item,id) => (
 										<Link
 											to={{
 												pathname: '/detail',
 												query: { key: '123' },
 											}}
+											key={id}
 										>
 											<div className={styles.goods}>
 												<div>
@@ -281,8 +283,10 @@ const Home = props => {
 };
 
 const mapStateToProps = state => {
+
 	return {
 		goodsInfoDate: state.goodsInfo
+		
 	}
 }
 

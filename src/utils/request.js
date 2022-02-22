@@ -16,7 +16,6 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(response => {
     const { status, msg } = response.data;
-    console.log(status, msg);
     if (status === 401 && msg === "TOKEN ERROR") {
         window.location.href = '/login';
     }

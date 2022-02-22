@@ -10,6 +10,7 @@ import decode from "jwt-decode";
 
 const Login = props => {
 const {loginFn} = props
+
   const [formObject] = Form.useForm();
   let navigate = useNavigate()
 	const submit = async () => {
