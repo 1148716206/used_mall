@@ -21,6 +21,7 @@ const {loginFn} = props
       // 存储token到本地
       localStorage.setItem('@#@TOKEN', data.token)
       // 1.同步用户状态 和 用户信息到redux
+			console.log('decode(data.token)',decode(data.token))
       loginFn.syncInfoAc(decode(data.token))
       message.success('登录成功')
       setTimeout(() => {
