@@ -10,20 +10,32 @@ import {
 	Popconfirm,
 	message,
 } from 'antd';
-
+import decode from 'jwt-decode';
 import styles from './index.module.less';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
-const { confirm } = Modal;
+
 const Personal = (props) => {
-	const { getUserDataFn, user, setUserGenderFn } = props;
+	const {
+		getUserDataFn,
+		user,
+		setUserGenderFn,
+		setNickNameFn,
+		setUserEmailFn,
+		setUserAddressFn,
+		setUserPhoneFn,
+	} = props;
 
 	const [modalObject, setModalObject] = useState({
+		id: 0,
+		oldValue: '',
 		visible: false,
 		type: '',
+		name: '',
 	});
 	const [userInfo, setUserInfo] = useState({
+		nickname: '',
 		username: '',
 		gender: 0,
 		email: '',
@@ -32,17 +44,17 @@ const Personal = (props) => {
 	const [formObject] = Form.useForm();
 
 	const personData = async () => {
-		const { data } = await getUserDataFn.getUserData(user.username);
-		// const data = {status:1}
+		const { data } = await getUserDataFn.getUserData(userInfo.username);
 		console.log(data);
 		if (data.status === 200) {
 			const userInfo = data.data[0];
-
 			setUserInfo({
 				id: userInfo.id,
 				username: userInfo.username,
+				nickname: userInfo.nickname,
 				gender: userInfo.gender,
 				email: userInfo.email,
+				phone: userInfo.phone,
 				address: userInfo.address,
 			});
 		}
@@ -52,45 +64,61 @@ const Personal = (props) => {
 		personData();
 	}, []);
 
-	  //切换教师 状态  对话框
-		function showDeleteConfirm(val) {
-			confirm({
-
-				title: '温馨提示',
-				content: '是否更改教师状态？',
-				okText: '确认',
-				okType: 'danger',
-				cancelText: '取消',
-				onOk() {
-					editGender(val)
-				},
-			});
-		}
-	
-
-	const editGender = async (userInfo) => {
+	const changeGender = async (userInfo) => {
 		if (userInfo.gender == 1) userInfo.gender = 0;
 		else userInfo.gender = 1;
+
 		const userData = {
 			id: userInfo.id,
 			gender: userInfo.gender,
 		};
-		const {status} = await setUserGenderFn.setUserGender(userData);
-		if(status === 200) {
-			 personData();
-			message.success('切换成功')
+
+		const { status } = await setUserGenderFn.setUserGender(userData);
+		if (status === 200) {
+			message.success('更换成功');
+			personData();
 		} else {
-			message.error('切换失败')
+			message.error('更换失败');
 		}
-
 	};
-
-
 
 	const modelOnCancel = () => {
 		setModalObject({ visible: false });
 	};
-	const modelOnOk = async () => {};
+	const modelOnOk = async (modalObject) => {
+		const editData = formObject.getFieldsValue();
+		const newData = {
+			id: userInfo.id,
+			...editData,
+		};
+
+		let updateStatus = 0;
+		if (modalObject.name === 'nickname') {
+			const { status } = await setNickNameFn.setNickName(newData);
+			updateStatus = status;
+		} else if (modalObject.name === 'email') {
+			const { status } = await setUserEmailFn.setUserEmail(newData);
+			updateStatus = status;
+		} else if (modalObject.name === 'address') {
+			const { status } = await setUserAddressFn.setUserAddress(newData);
+			updateStatus = status;
+		} else if (modalObject.name === 'phone') {
+			const { status } = await setUserPhoneFn.setUserPhone(newData);
+			updateStatus = status;
+		}
+
+		console.log('updateStatus', updateStatus);
+		setModalObject({ visible: false });
+		if (updateStatus === 200) {
+			message.success('更换成功');
+			setTimeout(() => {
+				personData();
+				console.log('再次请求');
+			}, 1000);
+		} else {
+			message.error('更换失败');
+		}
+	};
 	return (
 		<div className={styles.user_info_box}>
 			<div className={styles.user_info}>
@@ -105,15 +133,17 @@ const Personal = (props) => {
 				</div>
 				<div className={styles.info_list}>
 					<div className={styles.info_list__item}>
-						<div className={styles.title}>用户名</div>
-						<div className={styles.name}>{userInfo.username}</div>
+						<div className={styles.title}>昵称</div>
+						<div className={styles.name}>{userInfo.nickname || '你还没有昵称，赶快填写吧！'}</div>
 						<div className={styles.oprate}>
 							<Button
 								style={{ borderRadius: 30 }}
 								onClick={() => {
 									setModalObject({
+										oldValue: userInfo.nickname,
 										visible: true,
-										type: '用户名',
+										type: '昵称',
+										name: 'nickname',
 									});
 								}}
 							>
@@ -131,16 +161,20 @@ const Personal = (props) => {
 							{userInfo.gender === 0 ? '男' : '女'}
 						</div>
 						<div className={styles.oprate}>
-				
-								<Button
-									style={{ borderRadius: 30 }}
-									onClick={() => {
-										showDeleteConfirm(userInfo);
-									}}
-								>
-									切换
+							<Popconfirm
+								title={`是否更换性别为：${
+									userInfo.gender === 0 ? '女' : '男'
+								}`}
+								onConfirm={() => {
+									changeGender(userInfo);
+								}}
+								okText="确定"
+								cancelText="取消"
+							>
+								<Button style={{ borderRadius: 30 }}>
+									更换
 								</Button>
-					
+							</Popconfirm>
 						</div>
 					</div>
 					<Divider />
@@ -158,6 +192,8 @@ const Personal = (props) => {
 									setModalObject({
 										visible: true,
 										type: '密码',
+										name: 'password',
+										oldValue: '******',
 									});
 								}}
 							>
@@ -177,12 +213,37 @@ const Personal = (props) => {
 								style={{ borderRadius: 30 }}
 								onClick={() => {
 									setModalObject({
+										oldValue: userInfo.email,
 										visible: true,
 										type: '邮箱',
+										name: 'email',
 									});
 								}}
 							>
 								{userInfo.email ? '修改' : '新增'}
+							</Button>
+						</div>
+					</div>
+					<Divider />
+					<div
+						className={styles.info_list__item}
+						style={{ padding: 0 }}
+					>
+						<div className={styles.title}>电话号码</div>
+						<div className={styles.name}>{userInfo.phone}</div>
+						<div className={styles.oprate}>
+							<Button
+								style={{ borderRadius: 30 }}
+								onClick={() => {
+									setModalObject({
+										oldValue: userInfo.phone,
+										visible: true,
+										type: '电话号码',
+										name: 'phone',
+									});
+								}}
+							>
+								{userInfo.phone ? '修改' : '新增'}
 							</Button>
 						</div>
 					</div>
@@ -198,8 +259,10 @@ const Personal = (props) => {
 								style={{ borderRadius: 30 }}
 								onClick={() => {
 									setModalObject({
+										oldValue: userInfo.address,
 										visible: true,
 										type: '收货地址',
+										name: 'address',
 									});
 								}}
 							>
@@ -215,7 +278,9 @@ const Personal = (props) => {
 					title={`修改${modalObject.type}`}
 					visible={modalObject.visible}
 					onCancel={modelOnCancel}
-					onOk={modelOnOk}
+					onOk={() => {
+						modelOnOk(modalObject);
+					}}
 					maskClosable={false}
 					centered={true}
 					destroyOnClose
@@ -228,11 +293,12 @@ const Personal = (props) => {
 						form={formObject}
 						preserve={false}
 					>
-						{modalObject.type === '性别' ? (
-							'123'
-						) : (
-							<Input style={{ width: 200 }} />
-						)}
+						<Form.Item name={modalObject.name}>
+							<Input
+								style={{ width: 200 }}
+								defaultValue={modalObject.oldValue}
+							/>
+						</Form.Item>
 					</Form>
 				</Modal>
 			</div>
@@ -250,6 +316,10 @@ const mapDispatchToProps = (dispatch) => {
 	return {
 		getUserDataFn: bindActionCreators(actionCreators, dispatch),
 		setUserGenderFn: bindActionCreators(actionCreators, dispatch),
+		setNickNameFn: bindActionCreators(actionCreators, dispatch),
+		setUserEmailFn: bindActionCreators(actionCreators, dispatch),
+		setUserAddressFn: bindActionCreators(actionCreators, dispatch),
+		setUserPhoneFn: bindActionCreators(actionCreators, dispatch),
 	};
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Personal);
