@@ -7,9 +7,11 @@ import Home from './pages/home';
 import Personal from './pages/personal';
 // 购物车
 import Cart from './pages/cart'
+import Detail from './pages/detail'
 // 注册
 import Register from './pages/register';
 import  Navigator from './pages/navigator';
+import  Order from './pages/order';
 // 登录
 import Login from './pages/login';
 
@@ -34,6 +36,8 @@ export default class App extends Component {
 					<Route path="/personal" data={this.state} exact element={<Personal/>} />
 					<Route path="/login" data={this.state} element={<Login/>} />
 					<Route path="/register" data={this.state} element={<Register/>} />
+					<Route path="/detail" data={this.state} element={<Detail/>} />
+					<Route path="/Order" data={this.state} element={<Order/>} />
 				</Routes>
 			</Router>
 		);

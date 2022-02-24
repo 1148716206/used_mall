@@ -8,6 +8,7 @@ export const loginAc = data => {
 };
 
 export const syncInfoAc = data => {
+    console.log('login data',data)
     return {
         type: actionTypes.SYNC_STATE_INFO,
         payload: data

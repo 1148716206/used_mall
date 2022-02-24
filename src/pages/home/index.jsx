@@ -4,7 +4,7 @@ import styles from './index.module.less';
 import { Input, Button, Upload, Carousel, Modal, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SearchOutlined } from '@ant-design/icons';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators as getGoodsInfoActionCreators } from './store';
 
@@ -12,20 +12,18 @@ import { actionCreators as getGoodsInfoActionCreators } from './store';
 import Navigator from '../navigator';
 
 const { Dragger } = Upload;
-const Home = props => {
-
+const Home = (props) => {
 	const [editShow, setEditShow] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [managerInfoModal, setManagerInfoModal] = useState({ avatar: '' });
 	const [updateLoading, setUpdateLoading] = useState(false);
 
 	const [goodsList, setGoodsList] = useState([]);
-	const {goodsInfoFn} = props
+	const { goodsInfoFn } = props;
 
 	const getGoodsList = async () => {
-
-		const {data} = await goodsInfoFn.getGoodsInfo()
-		setGoodsList(data.data)
+		const { data } = await goodsInfoFn.getGoodsInfo();
+		setGoodsList(data.data);
 	};
 
 	useEffect(() => {
@@ -98,28 +96,27 @@ const Home = props => {
 
 	return (
 		<Fragment>
-      <div  className={styles.search_wrapper} >
-      <div className={styles.search}>
-				<div className={styles.search_img_box}>
-					<a href="//bj.meituan.com">
-						<img
-							src="//s0.meituan.net/bs/fe-web-meituan/87a1b8e/img/logo.png"
-							alt="美团"
-						/>
-					</a>
-				</div>
-				<div className={styles.search_search_box}>
-					<div className={styles.block}>
-						<input />
-						<button>
-							<SearchOutlined />
-						</button>
+			<div className={styles.search_wrapper}>
+				<div className={styles.search}>
+					<div className={styles.search_img_box}>
+						<a href="//bj.meituan.com">
+							<img
+								src="//s0.meituan.net/bs/fe-web-meituan/87a1b8e/img/logo.png"
+								alt="美团"
+							/>
+						</a>
+					</div>
+					<div className={styles.search_search_box}>
+						<div className={styles.block}>
+							<input />
+							<button>
+								<SearchOutlined />
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		
-      </div>
-				<div className={styles.wrapper}>
+			<div className={styles.wrapper}>
 				<div className={styles.main}>
 					<div className={styles.recommend}>
 						<div className={styles.recommend__title}>
@@ -132,11 +129,12 @@ const Home = props => {
 						</div>
 						<div className={styles.recommend__list}>
 							{goodsList
-								? goodsList.map((item,id) => (
+								? goodsList.map((item, id) => (
 										<Link
+											target="_blank"
 											to={{
 												pathname: '/detail',
-												query: { key: '123' },
+												query: id,
 											}}
 											key={id}
 										>
@@ -282,17 +280,15 @@ const Home = props => {
 	);
 };
 
-const mapStateToProps = state => {
-
+const mapStateToProps = (state) => {
 	return {
-		goodsInfoDate: state.goodsInfo
-		
-	}
-}
+		goodsInfoDate: state.goodsInfo,
+	};
+};
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
 	return {
-		goodsInfoFn: bindActionCreators(getGoodsInfoActionCreators, dispatch)
-	}
-}
-export default connect(mapStateToProps,mapDispatchToProps)(Home);
+		goodsInfoFn: bindActionCreators(getGoodsInfoActionCreators, dispatch),
+	};
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

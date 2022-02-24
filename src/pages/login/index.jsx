@@ -1,35 +1,35 @@
 import React from 'react';
-import { connect} from 'react-redux'
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators as loginActionCreators } from './store';
-import {Input, Space, Button, Tabs, Form, message, notification} from 'antd';
-import {Link,useNavigate} from 'react-router-dom';
-import styles from './index.module.less'
+import { Input, Space, Button, Tabs, Form, message, notification } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import styles from './index.module.less';
 
-import decode from "jwt-decode";
+import decode from 'jwt-decode';
 
-const Login = props => {
-const {loginFn} = props
+const Login = (props) => {
+	const { loginFn } = props;
 
-  const [formObject] = Form.useForm();
-  let navigate = useNavigate()
+	const [formObject] = Form.useForm();
+	let navigate = useNavigate();
 	const submit = async () => {
 		const sendData = await formObject.getFieldsValue();
-    const { data } = await loginFn.loginAc(sendData)
-    
-    if(data.status === 200) {
-      // 存储token到本地
-      localStorage.setItem('@#@TOKEN', data.token)
-      // 1.同步用户状态 和 用户信息到redux
-			console.log('decode(data.token)',decode(data.token))
-      loginFn.syncInfoAc(decode(data.token))
-      message.success('登录成功')
-      setTimeout(() => {
-        navigate("/");
-      }, 2000)
-    } else{
-      message.error('登录失败')
-    }
+		const { data } = await loginFn.loginAc(sendData);
+
+		if (data.status === 200) {
+			// 存储token到本地
+			localStorage.setItem('@#@TOKEN', data.token);
+			// 1.同步用户状态 和 用户信息到redux
+			console.log('decode(data.token)', decode(data.token));
+			loginFn.syncInfoAc(decode(data.token));
+			message.success('登录成功');
+			setTimeout(() => {
+				navigate('/');
+			}, 2000);
+		} else {
+			message.error('登录失败');
+		}
 	};
 
 	return (
@@ -71,7 +71,7 @@ const {loginFn} = props
 								没有账号？
 								<Link to="/register">点击注册</Link>
 							</span>
-							<Button type="link" >忘记密码？</Button>
+							<Button type="link">忘记密码？</Button>
 						</Space>
 						<div style={{ marginTop: 20 }}>
 							<Button
@@ -84,19 +84,26 @@ const {loginFn} = props
 						</div>
 					</Form>
 				</div>
+
+				<div className={styles.announce}>
+					<p>
+						Copyright 重庆工程学院 版权所有 渝ICP备09014106
+						渝公网安备 50011302000724号(建议使用IE9以上浏览器)
+					</p>
+				</div>
 			</div>
 		</div>
 	);
 };
 
-const mapStateToProps = state => {
-  return {
-    loginData: state.login
-  }
-}
-const mapDispatchToProps = dispatch => {
-  return {
-    loginFn: bindActionCreators(loginActionCreators, dispatch)
-  }
-}
-export default connect(mapStateToProps,mapDispatchToProps)(Login)
+const mapStateToProps = (state) => {
+	return {
+		loginData: state.login,
+	};
+};
+const mapDispatchToProps = (dispatch) => {
+	return {
+		loginFn: bindActionCreators(loginActionCreators, dispatch),
+	};
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

@@ -1,18 +1,17 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import { Navigate } from 'react-router';
-import { connect } from "react-redux";
-import { logout  } from '../login/store/actionCreators';
+import { connect } from 'react-redux';
+import { logout } from '../login/store/actionCreators';
 import { DownOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
 // import request from '../../utils/http';
-import { Link ,useNavigate} from 'react-router-dom';
-import { Upload, message, Menu, Dropdown,Button } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { Upload, message, Menu, Dropdown, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 const { Dragger } = Upload;
 
 const Navigator = () => {
-
 	const [editShow, setEditShow] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [managerInfoModal, setManagerInfoModal] = useState({ avatar: '' });
@@ -35,7 +34,7 @@ const Navigator = () => {
 		getUserInfo();
 		getGoodsList();
 	}, []);
-	let navigate = useNavigate()
+	let navigate = useNavigate();
 
 	const checkPicUpload = (file) => {
 		if (
@@ -101,23 +100,19 @@ const Navigator = () => {
 		setEditShow(false);
 	};
 
-
-  const menu = (
-    <Menu>
-      <Menu.Item key='personal'>
-				<Link to='personal'>
-        	个人中心
-				</Link>
-      </Menu.Item>
-			<Menu.Item key='order'>
-        订单详情
-      </Menu.Item>
-      <Menu.Item key='logout' onClick={logout}>
-       退出
-      </Menu.Item>
-    </Menu>
-  );
-  
+	const menu = (
+		<Menu>
+			<Menu.Item key="personal">
+				<Link to="personal">个人中心</Link>
+			</Menu.Item>
+			<Menu.Item key="order">
+				<Link to="order">订单详情</Link>
+			</Menu.Item>
+			<Menu.Item key="logout" onClick={logout}>
+				退出	
+			</Menu.Item>
+		</Menu>
+	);
 
 	return (
 		<div className={styles.header}>
@@ -129,18 +124,13 @@ const Navigator = () => {
 					</div>
 					<div className={styles.desc}>
 						{userLogin ? (
-							<Dropdown
-								overlay={menu}
-								placement="bottomRight"
-							
-							>
+							<Dropdown overlay={menu} placement="bottomRight">
 								<span className={styles.desc__user}>
-                  学不完的前端
-                  <span className={styles.desc__arrow}>
+									学不完的前端
+									<span className={styles.desc__arrow}>
 										<DownOutlined />
-										</span>
-                </span>
-                
+									</span>
+								</span>
 							</Dropdown>
 						) : (
 							<Fragment>
@@ -166,10 +156,10 @@ const Navigator = () => {
 		</div>
 	);
 };
-const mapStateToProps = state => {
-  return {
-    loginData: state.login,
-  };
+const mapStateToProps = (state) => {
+	return {
+		loginData: state.login,
+	};
 };
 
 export default connect(mapStateToProps, { logout })(Navigator);
