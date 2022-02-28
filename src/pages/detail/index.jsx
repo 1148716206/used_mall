@@ -3,15 +3,8 @@ import { useParams } from 'react-router-dom';
 import styles from './index.module.less';
 import robot from '../../assets/robot.png'
 import {
-	Divider,
 	Button,
-	Upload,
-	Modal,
-	Form,
-	Input,
-	Select,
 	Popconfirm,
-	message,
 	InputNumber,
 } from 'antd';
 import moment from 'moment';

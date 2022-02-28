@@ -21,7 +21,6 @@ const { Dragger } = Upload;
 const Personal = (props) => {
 	const {
 		getUserDataFn,
-		user,
 		setUserGenderFn,
 		setNickNameFn,
 		setUserEmailFn,

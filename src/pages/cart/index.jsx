@@ -1,13 +1,19 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Table, Radio, Divider, List, Avatar, Space, Button } from 'antd';
-import { MessageOutlined, LikeOutlined, StarOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
 import empty from '../../assets/empty.png';
+import moment from 'moment'
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { actionCreators } from './store';
 
-import axios from '../../utils/request';
 
-const Cart = () => {
-	const [goodsTotal, setGoodsTotal] = useState(1);
+const Cart = props => {
+
+	const {user, getCartInfoFn} = props
+	console.log('user',user)
+	const [cartStatus,setCartStatus] = useState(true)
+	const [cartList, setCartList] = useState([]);
 	const listData = [];
 	for (let i = 0; i < 23; i++) {
 		listData.push({
@@ -20,12 +26,28 @@ const Cart = () => {
 				'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
 		});
 	}
+
 	const getUser = async () => {
-		const { data } = await axios.post('/api/cart');
+	
+		const { data } = await getCartInfoFn.getCartInfo(user);
+		console.log('cart',data)
+		if(data.status === 200) {
+			const cartData = data.data.map((item) => ({
+				id: item.id,
+				username: item.username,
+				goods_img: item.goods_img,
+				goods_price: item.goods_price,
+				create_time: moment(item.create_time).format('YYYY-MM-DD HH:mm:ss'),
+				goods_count: item.goods_count,
+			}));
+
+			setCartList(cartData);
+		} 
+		
 	};
 	useEffect(() => {
 		getUser();
-	});
+	},[]);
 
 	const IconText = (icon, text) => (
 		<Space>
@@ -37,12 +59,12 @@ const Cart = () => {
 	return (
 		<div className={styles.cart_body}>
 			<div className={styles.cart_content}>
-				{goodsTotal ? (
+				{cartStatus ? (
 					<Fragment>
 						<div className={styles.cart_filter_bar}>
 							<span>全部商品</span>
 							<span className={styles.switch_cart_number}>
-								{goodsTotal}
+								{cartStatus}
 							</span>
 						</div>
 						<div className={styles.cart_thead}>
@@ -89,7 +111,9 @@ const Cart = () => {
 						</div>
 						<div className={styles.cart_tbody}>
 							<div className={styles.item_list}>
-								<li className={styles.sing_li}>
+							{
+								cartList ? cartList.map(item =>(
+									<li className={styles.sing_li}>
 									<div className={styles.check}>
 										<span>
 											<input type="checkbox" readOnly />
@@ -103,21 +127,25 @@ const Cart = () => {
 											/>
 										</div>
 										<div className={styles.right}>
-											<p>shop_name</p>
+											<p>{`item.name`}</p>
 										</div>
 									</div>
 									<div className={styles.single_price}>
-										￥：<span>100</span>元
+										￥：<span>{item.goods_price}</span>元
 									</div>
-									<div className={styles.number}>数量</div>
+									<div className={styles.number}>{item.goods_count}</div>
 									<div className={styles.subtotal}>
-										￥：<span>100</span>元
+										￥：<span>{item.goods_price*item.goods_count}</span>元
 									</div>
 									<div className={styles.operate}>
 										<Button type="danger">删除</Button>
 									</div>
 								</li>
-							</div>
+						
+								) 
+								) : null
+								}
+								</div>
 						</div>
 					</Fragment>
 				) : (
@@ -135,4 +163,17 @@ const Cart = () => {
 	);
 };
 
-export default Cart;
+const mapStateToProps = (state) => {
+	return {
+		user: state.login.user,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		getCartInfoFn: bindActionCreators(actionCreators, dispatch),
+		// getGoodsMessageFn: bindActionCreators(actionCreators, dispatch),
+	};
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Cart);
+
