@@ -16,6 +16,8 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
 
+const { Dragger } = Upload;
+
 const Personal = (props) => {
 	const {
 		getUserDataFn,
@@ -25,8 +27,10 @@ const Personal = (props) => {
 		setUserEmailFn,
 		setUserAddressFn,
 		setUserPhoneFn,
+		setUserAvatarFn,
+		getAvatarFn,
 	} = props;
-
+	const [managerInfoModal, setManagerInfoModal] = useState({ avatar: '' });
 	const [modalObject, setModalObject] = useState({
 		id: 0,
 		oldValue: '',
@@ -41,11 +45,13 @@ const Personal = (props) => {
 		email: '',
 		address: '',
 	});
+	const [avatar, setAvatar] = useState();
 	const [formObject] = Form.useForm();
 
 	const personData = async () => {
 		const { data } = await getUserDataFn.getUserData(userInfo.username);
 		console.log(data);
+	
 		if (data.status === 200) {
 			const userInfo = data.data[0];
 			setUserInfo({
@@ -59,10 +65,23 @@ const Personal = (props) => {
 			});
 		}
 	};
+	const getAvatar = async () => {
+		const { data } = await getAvatarFn.getAvatar(userInfo.username);
+		setAvatar(
+			'data:image/png;base64,' +
+				btoa(
+					new Uint8Array(data).reduce(
+						(data, byte) => data + String.fromCharCode(byte),
+						''
+					)
+				)
+		);
+	};
 
 	useEffect(() => {
 		personData();
-	}, []);
+		getAvatar();
+	}, [avatar]);
 
 	const changeGender = async (userInfo) => {
 		if (userInfo.gender == 1) userInfo.gender = 0;
@@ -119,22 +138,65 @@ const Personal = (props) => {
 			message.error('更换失败');
 		}
 	};
+
+	const checkPicUpload = async (file) => {
+		if (
+			!~['image/jpg', 'image/png', 'image/gif', 'image/jpeg'].indexOf(
+				file.type
+			)
+		) {
+			message.error('上传图片格式错误');
+			return false;
+		}
+
+		if (file.size > 4 * 1024 * 1024) {
+			message.error('上传图片大小超过 4MB');
+			return false;
+		}
+		console.log('file', file);
+		let formData = new FormData();
+		formData.append('images', file);
+
+		const { data } = await setUserAvatarFn.setUserAvatar(formData);
+		console.log(data);
+	};
+	const hasPicUpload = ({ file }) => {
+		console.log(file)
+		if (file.status === 'error') {
+			message.error('图片上传失败');
+		}
+		if (file.status === 'done') {
+			message.success('图片上传成功');
+			// setManagerInfoModal({
+			//   avatar: `${formAction.filepath}${file.response.url}`,
+			// });
+		}
+	};
+
+
 	return (
 		<div className={styles.user_info_box}>
 			<div className={styles.user_info}>
 				<div className={styles.head_img}>
-					<img
-						src="//s0.meituan.net/bs/fe-web-meituan/e3064a3/img/head-img.png"
-						alt=""
-					/>
-					<Upload className={styles.upload}>
-						<Button>上传头像</Button>
-					</Upload>
+					<Dragger
+						style={{ borderRadius: '50%' }}
+						name="avator"
+						// headers={{
+						//   'X-Requested-With': null,
+						// }}
+						beforeUpload={checkPicUpload}
+						showUploadList={false}
+						onChange={hasPicUpload}
+					>
+						<img role="presentation" src={avatar} alt="" />
+					</Dragger>
 				</div>
 				<div className={styles.info_list}>
 					<div className={styles.info_list__item}>
 						<div className={styles.title}>昵称</div>
-						<div className={styles.name}>{userInfo.nickname || '你还没有昵称，赶快填写吧！'}</div>
+						<div className={styles.name}>
+							{userInfo.nickname || '你还没有昵称，赶快填写吧！'}
+						</div>
 						<div className={styles.oprate}>
 							<Button
 								style={{ borderRadius: 30 }}
@@ -315,11 +377,13 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		getUserDataFn: bindActionCreators(actionCreators, dispatch),
+		getAvatarFn: bindActionCreators(actionCreators, dispatch),
 		setUserGenderFn: bindActionCreators(actionCreators, dispatch),
 		setNickNameFn: bindActionCreators(actionCreators, dispatch),
 		setUserEmailFn: bindActionCreators(actionCreators, dispatch),
 		setUserAddressFn: bindActionCreators(actionCreators, dispatch),
 		setUserPhoneFn: bindActionCreators(actionCreators, dispatch),
+		setUserAvatarFn: bindActionCreators(actionCreators, dispatch),
 	};
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Personal);

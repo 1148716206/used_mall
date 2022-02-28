@@ -7,7 +7,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators as getGoodsInfoActionCreators } from './store';
-
+import axios from '../../utils/request'
 // 导航
 import Navigator from '../navigator';
 
@@ -23,6 +23,7 @@ const Home = (props) => {
 
 	const getGoodsList = async () => {
 		const { data } = await goodsInfoFn.getGoodsInfo();
+		console.log('data',data)
 		setGoodsList(data.data);
 	};
 
@@ -47,16 +48,9 @@ const Home = (props) => {
 		console.log('file', file);
 		let formData = new FormData();
 		formData.append('images', file);
-		// const result =  request.post('api/uploadGoodsImg', formData,{ headers: { 'content-type': 'multipart/form-data' } },)
-		// console.log(result)
-		/*    return new Promise(
-      (resolve, reject) => dispatch({
-        type: 'GET_UPLOAD_ACTIVITY',
-        resolve,
-        reject,
-        id: activityId,
-      })).then(() => {})
-      .catch(e => message.error(e));*/
+		const result =  axios.post('api/uploadGoodsImg', formData,{ headers: { 'content-type': 'multipart/form-data' } },)
+		console.log(result)
+
 	};
 
 	// @ts-ignore
@@ -132,10 +126,7 @@ const Home = (props) => {
 								? goodsList.map((item, id) => (
 										<Link
 											target="_blank"
-											to={{
-												pathname: '/detail',
-												query: id,
-											}}
+											to={'/detail/'+`${item.goods_id}`}
 											key={id}
 										>
 											<div className={styles.goods}>
@@ -212,7 +203,7 @@ const Home = (props) => {
 							<span className={styles.tt}>图片:</span>
 							<span className={styles.ct}>
 								<Dragger
-									name="file"
+									name="avator"
 									// headers={{
 									//   'X-Requested-With': null,
 									// }}

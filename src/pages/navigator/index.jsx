@@ -121,6 +121,7 @@ const Navigator = () => {
 					<div className={styles.nav}>
 						<Link to="/">交易大厅</Link>
 						<Link to="/cart">购物车</Link>
+						<Link to="/pulish">发布商品</Link>
 					</div>
 					<div className={styles.desc}>
 						{userLogin ? (
