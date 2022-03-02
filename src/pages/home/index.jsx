@@ -7,7 +7,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators as getGoodsInfoActionCreators } from './store';
-import axios from '../../utils/request'
+import axios from '../../utils/request';
 // 导航
 import Navigator from '../navigator';
 
@@ -23,7 +23,7 @@ const Home = (props) => {
 
 	const getGoodsList = async () => {
 		const { data } = await goodsInfoFn.getGoodsInfo();
-		console.log('data',data)
+		console.log('data', data);
 		setGoodsList(data.data);
 	};
 
@@ -48,9 +48,10 @@ const Home = (props) => {
 		console.log('file', file);
 		let formData = new FormData();
 		formData.append('images', file);
-		const result =  axios.post('api/uploadGoodsImg', formData,{ headers: { 'content-type': 'multipart/form-data' } },)
-		console.log(result)
-
+		const result = axios.post('api/uploadGoodsImg', formData, {
+			headers: { 'content-type': 'multipart/form-data' },
+		});
+		console.log(result);
 	};
 
 	// @ts-ignore
@@ -126,7 +127,7 @@ const Home = (props) => {
 								? goodsList.map((item, id) => (
 										<Link
 											target="_blank"
-											to={'/detail/'+`${item.goods_id}`}
+											to={'/detail/' + `${item.goods_id}`}
 											key={id}
 										>
 											<div className={styles.goods}>
@@ -136,28 +137,19 @@ const Home = (props) => {
 														alt=""
 													/>
 												</div>
-												<div
-													className={
-														styles.product_info
-													}
-												>
-													<p
-														className={
-															styles.product_info__title
-														}
-													>
-														自由港湾，智能自主入住湖景房
+												<div className={styles.product_info}>
+													<p className={styles.product_info__title}>
+														{item.goods_name}
 													</p>
-													<p
-														className={
-															styles.product_info__new_price
-														}
-													>
-														<span
-															className={
-																styles.price_icon
+													<div className={styles.product_info__desc}>
+														<p className={styles.quality}>
+															{
+																item.quality !== 10 ? `${item.quality}成新 ` : '全新 '
 															}
-														>
+												
+														</p>
+													<p className={styles.product_info__new_price}>
+														<span className={styles.price_icon}>
 															￥
 														</span>
 														{item.new_price}
@@ -176,7 +168,9 @@ const Home = (props) => {
 															{item.old_price}
 														</span>
 													</p>
-												</div>
+											
+													</div>
+													</div>
 											</div>
 										</Link>
 								  ))

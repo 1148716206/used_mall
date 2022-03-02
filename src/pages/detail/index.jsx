@@ -1,19 +1,13 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './index.module.less';
-import robot from '../../assets/robot.png'
-import {
-	Button,
-	Popconfirm,
-	InputNumber,
-} from 'antd';
+import robot from '../../assets/robot.png';
+import { Button, Popconfirm, InputNumber } from 'antd';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
-
-
 
 const Detail = (props) => {
 	const pramas = useParams();
@@ -69,19 +63,19 @@ const Detail = (props) => {
 	};
 	const getGoodsMessage = async () => {
 		const { data } = await getGoodsMessageFn.getGoodsMessage(pramas);
-		console.log('message',data.data)
+
 		if (data.status === 200 && data.data) {
-		
 			const messageData = data.data.map((message) => ({
 				id: message.id,
 				username: message.username,
-				create_time: moment(message.create_time).format('YYYY-MM-DD HH:mm:ss'),
+				create_time: moment(message.create_time).format(
+					'YYYY-MM-DD HH:mm:ss'
+				),
 				content: message.content,
 			}));
 			setGoodsMessaga(messageData);
 		}
 	};
-	console.log('goods',goodsMessage)
 
 	const handleInfiniteOnLoad = () => {
 		// if (pages.page * pages.pageSize >= pages.total && updateLoading) {
@@ -121,47 +115,64 @@ const Detail = (props) => {
 				<div className={styles.content_box}>
 					<div className={styles.content_box__item}>
 						<span className={styles.info_title}>商品名称：</span>
-						{goodsInfo.goods_name}
+						<span className={styles.info_item}>
+							{goodsInfo.goods_name}
+						</span>
 					</div>
 
 					<div className={styles.content_box__item}>
 						<span className={styles.info_title}>
 							成&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;色：
 						</span>
-						{goodsInfo.quality}
+						<span className={styles.info_item}>
+							{goodsInfo.quality}
+						</span>
 					</div>
 
 					<div className={styles.content_box__item}>
 						<span className={styles.info_title}>
 							单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价：
 						</span>
-						{goodsInfo.new_price}
+						<span className={styles.new_price}>
+							￥{goodsInfo.new_price}
+						</span>
+						<span className={styles.old_price}>
+							￥{goodsInfo.old_price}
+						</span>
 					</div>
 
 					<div className={styles.content_box__item}>
 						<span className={styles.info_title}>
 							数&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;量：
 						</span>
-						{goodsInfo.goods_number}
+						<span className={styles.info_item}>
+							{goodsInfo.goods_number}
+						</span>
 					</div>
 
 					<div className={styles.content_box__item}>
 						<span className={styles.info_title}>
 							详&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;情：
 						</span>
-						{goodsInfo.goods_desc}
+						<span className={styles.info_desc}>
+							{goodsInfo.goods_desc}
+						</span>
 					</div>
 
 					<div className={styles.content_box__item}>
 						<span className={styles.info_title}>发布时间：</span>
-						{goodsInfo.create_time}
+						<span className={styles.info_item}>
+							{goodsInfo.create_time}
+						</span>
 					</div>
 
 					<div className={styles.content_box__item}>
 						<span className={styles.info_title}>
 							发&nbsp;&nbsp;布&nbsp;&nbsp;人：
 						</span>
-						{goodsInfo.username}
+						<span className={styles.info_item}>
+							{goodsInfo.username}
+						</span>
 					</div>
 					<div className={styles.goods_operate}>
 						<InputNumber

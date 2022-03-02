@@ -1,91 +1,212 @@
-import React, { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
+import { InputNumber, Menu, Divider, List, Avatar, Space, Button } from 'antd';
+import {Link} from 'react-router-dom'
 import styles from './index.module.less';
-import {
-	Divider,
-	Button,
-	Upload,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Popconfirm,
-	message,
-	InputNumber,
-} from 'antd';
-const Detail = () => {
-	const [goodsInfo, setGoodsInfo] = useState({
-		nickname: '',
-		username: '',
-		gender: 0,
-		email: '',
-		address: '',
-	});
+import empty from '../../assets/empty.png';
+import moment from 'moment';
+// import { connect } from 'react-redux';
+// import { bindActionCreators } from 'redux';
+// import { actionCreators } from './store';
+
+const Order = (props) => {
+	// const { user, getCartInfoFn } = props;
+	// console.log('user', user);
+	const [cartStatus, setCartStatus] = useState(true);
+	const [cartList, setCartList] = useState([]);
+
+	// const getUser = async () => {
+	// 	const { data } = await getCartInfoFn.getCartInfo(user);
+	// 	console.log('cart', data);
+	// 	if (data.status === 200) {
+	// 		const cartData = data.data.map((item) => ({
+	// 			id: item.id,
+	// 			username: item.username,
+	// 			goods_img: item.goods_img,
+	// 			goods_price: item.goods_price,
+	// 			create_time: moment(item.create_time).format(
+	// 				'YYYY-MM-DD HH:mm:ss'
+	// 			),
+	// 			goods_count: item.goods_count,
+	// 		}));
+
+	// 		setCartList(cartData);
+	// 	}
+	// };
+	useEffect(() => {
+		// getUser();
+	}, []);
+
+	const IconText = (icon, text) => (
+		<Space>
+			{React.createElement(icon)}
+			{text}
+		</Space>
+	);
+
 	return (
-		<div className={styles.detail_body}>
-			<div className={styles.img_box}>
-				<img src="" alt="" />
-			</div>
-订单订单订单订单订单订单订单订单订单订单订单订单订单订单订单订单订单订单
-			<div className={styles.content_box}>
-				<div className={styles.content_box__item}>
-					<span className={styles.info_title}>商品名称：</span>
-					goods_name
-				</div>
-
-				<div className={styles.content_box__item}>
-					<span className={styles.info_title}>
-						成&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;色：
-					</span>
-					goods_quality
-				</div>
-
-				<div className={styles.content_box__item}>
-					<span className={styles.info_title}>
-						单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价：
-					</span>
-					goods_price
-				</div>
-
-				<div className={styles.content_box__item}>
-					<span className={styles.info_title}>
-						数&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;量：
-					</span>
-					goods_number
-				</div>
-
-				<div className={styles.content_box__item}>
-					<span className={styles.info_title}>
-						详&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;情：
-					</span>
-					京东平台卖家销售并发货的商品，由平台卖家提供发票和相应的售后服务。请您放心购买！
-					注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解
-				</div>
-
-				<div className={styles.content_box__item}>
-					<span className={styles.info_title}>发布时间：</span>
-					goods_pulish_time
-				</div>
-
-				<div className={styles.content_box__item}>
-					<span className={styles.info_title}>
-						发&nbsp;&nbsp;布&nbsp;&nbsp;人：
-					</span>
-					goods_publisher
-				</div>
-				<div className={styles.goods_operate}>
-					<InputNumber
-						className={styles.input_number}
-						min={1}
-						max={10}
-						defaultValue={3}
-					/>
-					<Button size="large" type="primary" danger className={styles.add_button}>
-						加入购物车
-					</Button>
-
-				</div>
+		<div className={styles.cart_body}>
+			<div className={styles.cart_content}>
+				{cartStatus ? (
+					<Fragment>
+						<div className={styles.cart_filter_bar}>
+							<Menu
+								theme="light"
+								mode="horizontal"
+								defaultSelectedKeys={['1']}
+							>
+								<Menu.Item key="1">
+									全部订单
+								</Menu.Item>
+								<Menu.Item key="2">
+									待发货
+								</Menu.Item>
+								<Menu.Item key="3">
+									待收货
+								</Menu.Item>
+								<Menu.Item key="4">
+									待评价
+								</Menu.Item>
+							</Menu>
+							<span className={styles.switch_cart_number}>
+								{cartStatus}
+							</span>
+						</div>
+						<div className={styles.cart_thead}>
+							<div
+								className={`${styles.column} ${styles.t_checkbox}`}
+							>
+								<div className={styles.cart_checkbox}>
+									<input
+										type="checkbox"
+										name="select-all"
+										className={styles.input_checkbox}
+									/>
+								</div>
+								全选
+							</div>
+							<div
+								className={`${styles.column} ${styles.t_goods}`}
+							>
+								商品
+							</div>
+							<div
+								className={`${styles.column} ${styles.t_props}`}
+							>
+								&nbsp;
+							</div>
+							<div
+								className={`${styles.column} ${styles.t_quantity}`}
+							>
+								数量
+							</div>
+							<div className={`${styles.column} ${styles.t_sum}`}>
+								金额
+							</div>
+							<div className={`${styles.column} ${styles.t_sum}`}>
+								状态
+							</div>
+							<div
+								className={`${styles.column} ${styles.t_action}`}
+							>
+								操作
+							</div>
+						</div>
+						<div className={styles.cart_tbody}>
+							<div className={styles.item_list}>
+								{cartList
+									? cartList.map((item) => (
+											<li className={styles.sing_li}>
+												<div className={styles.check}>
+													<span>
+														<input
+															type="checkbox"
+															readOnly
+														/>
+													</span>
+												</div>
+												<div
+													className={styles.goods_img}
+												>
+													<div
+														className={styles.left}
+													>
+														<img
+															src="http://www.cz2000.top/bs/admin/images/ByteDance-cup-1.jpg"
+															alt=""
+														/>
+													</div>
+													<div
+														className={styles.right}
+													>
+														<p>{`item.name`}</p>
+													</div>
+												</div>
+												<div
+													className={
+														styles.single_price
+													}
+												>
+													￥：
+													<span>
+														{item.goods_price}
+													</span>
+													元
+												</div>
+												<div className={styles.number}>
+													<InputNumber
+														defaultValue={
+															item.goods_count
+														}
+													/>
+												</div>
+												<div
+													className={styles.subtotal}
+												>
+													￥：
+													<span>
+														{item.goods_price *
+															item.goods_count}
+													</span>
+													元
+												</div>
+												<div className={styles.operate}>
+													<Button type="danger">
+														删除
+													</Button>
+												</div>
+											</li>
+									  ))
+									: null}
+							</div>
+						</div>
+					</Fragment>
+				) : (
+					<div className={styles.cart_empty}>
+						<div>
+							<img src={empty} alt="暂无商品" />
+							<p>购物车空空如也~</p>
+							<p>去看看心仪的商品吧~</p>
+							<p className={styles.to_shopping}>去购物`{'>'}` </p>
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);
 };
-export default Detail;
+
+// const mapStateToProps = (state) => {
+// 	return {
+// 		user: state.login.user,
+// 	};
+// };
+
+// const mapDispatchToProps = (dispatch) => {
+// 	return {
+// 		getCartInfoFn: bindActionCreators(actionCreators, dispatch),
+// 		// getGoodsMessageFn: bindActionCreators(actionCreators, dispatch),
+// 	};
+// };
+// export default connect(mapStateToProps, mapDispatchToProps)(Cart);
+
+export default Order;
