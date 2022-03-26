@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './index.module.less';
-import { Input, Button, Upload, Carousel, Modal, message } from 'antd';
+import { Input, Button, Upload, Carousel, Modal, message,Pagination  } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SearchOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -10,7 +10,7 @@ import { actionCreators as getGoodsInfoActionCreators } from './store';
 import axios from '../../utils/request';
 // 导航
 import Navigator from '../navigator';
-
+import logo from '../../assets/home_logo.jpg';
 const { Dragger } = Upload;
 const Home = (props) => {
 	const [editShow, setEditShow] = useState(false);
@@ -94,10 +94,10 @@ const Home = (props) => {
 			<div className={styles.search_wrapper}>
 				<div className={styles.search}>
 					<div className={styles.search_img_box}>
-						<a href="//bj.meituan.com">
+						<a href="http://localhost:3000/">
 							<img
-								src="//s0.meituan.net/bs/fe-web-meituan/87a1b8e/img/logo.png"
-								alt="美团"
+								src={logo}
+								alt="酷物"
 							/>
 						</a>
 					</div>
@@ -177,13 +177,16 @@ const Home = (props) => {
 								: null}
 						</div>
 					</div>
-					<Button
+					<div style={{float:"right",marginTop:20}}>
+					<Pagination defaultCurrent={1} total={15} />
+					</div>
+					{/* <Button
 						onClick={() => {
 							setEditShow(true);
 						}}
 					>
 						上传图片
-					</Button>
+					</Button> */}
 				</div>
 				<Modal
 					visible={editShow}

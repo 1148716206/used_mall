@@ -5,6 +5,7 @@ import { bindActionCreators } from "redux";
 import { actionCreators as registerActionCreators } from "./store";
 import {Input, Button, Form, message} from 'antd';
 import styles from './index.module.less'
+import logo from '../../assets/logo.jpg';
 const Register = props => {
 
   const [formObject] = Form.useForm();
@@ -52,6 +53,9 @@ const {registerFn} = props
     <div className={styles.login_body}>
       <div className={styles.login_content}>
         <div className={styles.login_panel}>
+				<div className={styles.title}>
+						<img src={logo} alt="" />
+					</div>
           <h1 className={styles.login_title}>快速注册</h1>
       <Form 
 				className={styles.login_form} 
@@ -91,6 +95,12 @@ const {registerFn} = props
         </Form.Item>
       </Form>
         </div>
+				<div className={styles.announce}>
+					<p>
+						Copyright 酷物二手交易商城 版权所有
+						渝ICP备2022000537号(建议使用IE9以上浏览器)
+					</p>
+				</div>
       </div>
     </div>
   )

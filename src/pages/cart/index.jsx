@@ -1,5 +1,15 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { InputNumber, Radio, Divider, List, Avatar, Space, Button } from 'antd';
+import {
+	InputNumber,
+	Radio,
+	Divider,
+	List,
+	Avatar,
+	Space,
+	Button,
+	Table,
+	Tag,
+} from 'antd';
 import styles from './index.module.less';
 import empty from '../../assets/empty.png';
 import moment from 'moment';
@@ -12,35 +22,98 @@ const Cart = (props) => {
 	console.log('user', user);
 	const [cartStatus, setCartStatus] = useState(true);
 	const [cartList, setCartList] = useState([]);
+	const [changeItem, setChangeItem] = useState(0);
+	const [goodsTotal, setGoodsTotal] = useState(0);
+	const [totalPrice, setTotalPrice] = useState(0);
 
 	const getUser = async () => {
 		const { data } = await getCartInfoFn.getCartInfo(user);
 		console.log('cart', data);
 		if (data.status === 200) {
 			const cartData = data.data.map((item) => ({
+				key: item.id,
 				id: item.id,
 				username: item.username,
 				goods_img: item.goods_img,
 				goods_price: item.goods_price,
+
 				create_time: moment(item.create_time).format(
 					'YYYY-MM-DD HH:mm:ss'
 				),
 				goods_count: item.goods_count,
 			}));
-
+			let goods_total = 0;
+			let goods_price = 0
+			cartData.map((item) => {
+				goods_price += item.goods_price*item.goods_count
+				return goods_total += item.goods_count;
+			});
+			setGoodsTotal(goods_total);
+			setTotalPrice(goods_price);
 			setCartList(cartData);
 		}
 	};
+
+	const getChangerId = (val) => {
+		// console.log('id',val)
+		setChangeItem(val);
+	};
+	const numberChange = (e) => {
+		// console.log(changeItem)
+		console.log(changeItem);
+	};
+
 	useEffect(() => {
 		getUser();
 	}, []);
 
-	const IconText = (icon, text) => (
-		<Space>
-			{React.createElement(icon)}
-			{text}
-		</Space>
-	);
+	const columns = [
+		{
+			title: '商品名称',
+			key: 'goods_name',
+			dataIndex: 'goods_name',
+			render: (text) => <a>{text}</a>,
+		},
+
+		{
+			title: '单价',
+			key: 'goods_price',
+			dataIndex: 'goods_price',
+			render: (v) => `￥：${v}`,
+		},
+		{
+			title: '数量',
+			key: 'goods_count',
+			dataIndex: 'goods_count',
+			render: (v, row) => (
+				<div
+					onClick={() => {
+						getChangerId(row.id);
+					}}
+				>
+					<InputNumber
+						min={1}
+						defaultValue={v}
+						onChange={numberChange}
+					/>
+				</div>
+			),
+		},
+		{
+			title: '操作',
+			key: 'operate',
+			dataIndex: 'operate',
+			render: (row) => (
+				<>
+					<Button type="danger" style={{ padding: '4px 8px' }}>
+						刪除
+					</Button>
+				</>
+			),
+		},
+	];
+
+	const rowSelection = {};
 
 	return (
 		<div className={styles.cart_body}>
@@ -53,110 +126,25 @@ const Cart = (props) => {
 								{cartStatus}
 							</span>
 						</div>
-						<div className={styles.cart_thead}>
-							<div
-								className={`${styles.column} ${styles.t_checkbox}`}
-							>
-								<div className={styles.cart_checkbox}>
-									<input
-										type="checkbox"
-										name="select-all"
-										className={styles.input_checkbox}
-									/>
-								</div>
-								全选
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_goods}`}
-							>
-								商品
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_props}`}
-							>
-								&nbsp;
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_price}`}
-							>
-								单价
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_quantity}`}
-							>
-								数量
-							</div>
-							<div className={`${styles.column} ${styles.t_sum}`}>
-								小计
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_action}`}
-							>
-								操作
-							</div>
+						<div>
+							<Table
+								rowSelection={{
+									...rowSelection,
+								}}
+								columns={columns}
+								dataSource={cartList}
+								// pagination={false}
+							/>
 						</div>
-						<div className={styles.cart_tbody}>
-							<div className={styles.item_list}>
-								{cartList
-									? cartList.map((item) => (
-											<li className={styles.sing_li}>
-												<div className={styles.check}>
-													<span>
-														<input
-															type="checkbox"
-															readOnly
-														/>
-													</span>
-												</div>
-												<div
-													className={styles.goods_img}
-												>
-													<div
-														className={styles.left}
-													>
-														<img
-															src="http://www.cz2000.top/bs/admin/images/ByteDance-cup-1.jpg"
-															alt=""
-														/>
-													</div>
-													<div
-														className={styles.right}
-													>
-														<p>{`item.name`}</p>
-													</div>
-												</div>
-												<div
-													className={
-														styles.single_price
-													}
-												>
-													￥：
-													<span>
-														{item.goods_price}
-													</span>
-													元
-												</div>
-												<div className={styles.number}>
-													<InputNumber defaultValue={item.goods_count}/>
-												</div>
-												<div
-													className={styles.subtotal}
-												>
-													￥：
-													<span>
-														{item.goods_price *
-															item.goods_count}
-													</span>
-													元
-												</div>
-												<div className={styles.operate}>
-													<Button type="danger">
-														删除
-													</Button>
-												</div>
-											</li>
-									  ))
-									: null}
+						<div className={styles.user_shop_total}>
+							<div className={styles.right}>
+								<div className={styles.right__total}>
+									共 <span>{goodsTotal}</span> 件商品，合计：
+									<span>{totalPrice}</span> 元
+								</div>
+								<Button type="primary" onClick={() => {}}>
+									去结算
+								</Button>
 							</div>
 						</div>
 					</Fragment>

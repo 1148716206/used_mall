@@ -5,7 +5,7 @@ import { actionCreators as loginActionCreators } from './store';
 import { Input, Space, Button, Tabs, Form, message, notification } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './index.module.less';
-
+import logo from '../../assets/logo.jpg';
 import decode from 'jwt-decode';
 
 const Login = (props) => {
@@ -28,7 +28,7 @@ const Login = (props) => {
 				navigate('/');
 			}, 2000);
 		} else {
-			message.error('登录失败');
+			message.error('登录失败，请检查账号或密码');
 		}
 	};
 
@@ -36,6 +36,9 @@ const Login = (props) => {
 		<div className={styles.login_body}>
 			<div className={styles.login_content}>
 				<div className={styles.login_panel}>
+					<div className={styles.title}>
+						<img src={logo} alt="" />
+					</div>
 					<h1 className={styles.login_title}>登录</h1>
 					<Form
 						className={styles.login_form}
@@ -87,8 +90,8 @@ const Login = (props) => {
 
 				<div className={styles.announce}>
 					<p>
-						Copyright 重庆工程学院 版权所有 渝ICP备09014106
-						渝公网安备 50011302000724号(建议使用IE9以上浏览器)
+						Copyright 酷物二手交易商城 版权所有
+						渝ICP备2022000537号(建议使用IE9以上浏览器)
 					</p>
 				</div>
 			</div>

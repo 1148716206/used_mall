@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './index.module.less';
 import robot from '../../assets/robot.png';
-import { Button, Popconfirm, InputNumber } from 'antd';
+import { Button, Popconfirm, InputNumber,Pagination  } from 'antd';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { connect } from 'react-redux';
@@ -26,6 +26,14 @@ const Detail = (props) => {
 		create_time: '',
 		username: '',
 	});
+
+	const [pagination, setPagination] = useState({
+    current: 1,
+    total: 1,
+    pageSize: 10,
+    showSizeChanger: true,
+    pageSizeOptions: ['10', '50', '200', '500'],
+  });
 	const [goodsMessage, setGoodsMessaga] = useState([]);
 
 	const [messageList, setMessageList] = useState([
@@ -77,29 +85,9 @@ const Detail = (props) => {
 		}
 	};
 
-	const handleInfiniteOnLoad = () => {
-		// if (pages.page * pages.pageSize >= pages.total && updateLoading) {
-		// 		return;
-		// }
-		// setUpdateLoading(true);
-		// getAnswerList(searchQuestionId, pages.page + 1);
-	};
 
-	const deleteAnswer = (id) => {
-		// new Promise((resolve, reject) =>
-		// 		dispatch({
-		// 				type: 'DELETE_ANSWER',
-		// 				resolve,
-		// 				reject,
-		// 				answerId: id,
-		// 				id: activityId,
-		// 		}))
-		// 		.then(() => {
-		// 				getQuestionList(1, 99);
-		// 				getAnswerList(currentQuesIndex);
-		// 				message.success('删除成功');
-		// 		});
-	};
+
+
 	useEffect(() => {
 		getGoodsDetail();
 		getGoodsMessage();
@@ -195,14 +183,7 @@ const Detail = (props) => {
 			<div className={styles.message_body}>
 				<div className={styles.message_title}>留言：</div>
 				<ul className={styles.modal_box_message}>
-					<InfiniteScroll
-						initialLoad={false}
-						pageStart={0}
-						loadMore={handleInfiniteOnLoad}
-						// hasMore={pages.page * pages.pageSize < pages.total && !updateLoading}
-						useWindow={false}
-						className={styles.multi_modal_box_list}
-					>
+		
 						{goodsMessage
 							? goodsMessage.map((item) => (
 									<li
@@ -231,9 +212,9 @@ const Detail = (props) => {
 											<span>2022-02-15 15:51</span>
 											<Popconfirm
 												title="确定要删除该留言吗？"
-												onConfirm={() =>
-													deleteAnswer(item.id)
-												}
+												// onConfirm={() =>
+												// 	deleteAnswer(item.id)
+												// }
 												okText="确定"
 												cancelText="取消"
 											>
@@ -245,7 +226,7 @@ const Detail = (props) => {
 									</li>
 							  ))
 							: null}
-					</InfiniteScroll>
+					
 				</ul>
 			</div>
 		</Fragment>
