@@ -32,6 +32,7 @@ export default class App extends Component {
 			<Router>
         <Navigator/>
 				<Routes>
+					<Route path="/pulish" data={this.state} element={<Pulish/>} />
 					<Route path="/" data={this.state} exact element={<Home/>} />
 					<Route path="/cart" data={this.state} exact element={<Cart/>} />
 					<Route path="/personal" data={this.state} exact element={<Personal/>} />
@@ -39,7 +40,6 @@ export default class App extends Component {
 					<Route path="/register" data={this.state} element={<Register/>} />
 					<Route path="/detail/:goods_id" data={this.state} element={<Detail/>} />
 					<Route path="/order" data={this.state} element={<Order/>} />
-					<Route path="/pulish" data={this.state} element={<Pulish/>} />
 				</Routes>
 			</Router>
 		);

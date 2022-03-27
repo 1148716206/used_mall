@@ -1,8 +1,8 @@
 import axios from '../../../utils/request';
 
-export const getCartInfo = data => {
+export const getOrder = data => {
     return dispatch => {
-        return axios.post('/api/cart/getCartInfo', data);
+        return axios.post('/api/order/getOrder', data);
     };
 };
 

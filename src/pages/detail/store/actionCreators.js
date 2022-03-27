@@ -15,5 +15,10 @@ export const getGoodsMessage = data => {
     }
   }
 
+  export const addCart = data => {
+    return dispatch => {
+        return axios.post('/api/cart/addCart', data);
+    };
+};
 
 

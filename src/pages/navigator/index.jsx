@@ -6,14 +6,16 @@ import { DownOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
 // import request from '../../utils/http';
 import { Link, useNavigate } from 'react-router-dom';
-import { Upload, message, Menu, Dropdown, Button } from 'antd';
+import { Upload, message, Menu, Dropdown, Modal } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-
 const { Dragger } = Upload;
 
-const Navigator = () => {
+const Navigator = (props) => {
+	
+	const { loginData, logout } = props;
 	const [editShow, setEditShow] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [logoutVisible, setLogoutVisible] = useState(false);
 	const [managerInfoModal, setManagerInfoModal] = useState({ avatar: '' });
 	const [updateLoading, setUpdateLoading] = useState(false);
 
@@ -33,7 +35,7 @@ const Navigator = () => {
 	useEffect(() => {
 		getUserInfo();
 		getGoodsList();
-	}, []);
+	}, [loginData.isAuth]);
 	let navigate = useNavigate();
 
 	const checkPicUpload = (file) => {
@@ -100,6 +102,15 @@ const Navigator = () => {
 		setEditShow(false);
 	};
 
+	const logoutOk = () => {
+		logout()
+    setLogoutVisible(false);
+  };
+
+  const logoutCancel = () => {
+    setLogoutVisible(false);
+  };
+
 	const menu = (
 		<Menu>
 			<Menu.Item key="personal">
@@ -108,9 +119,9 @@ const Navigator = () => {
 			<Menu.Item key="order">
 				<Link to="order">订单详情</Link>
 			</Menu.Item>
-			<Menu.Item key="logout" onClick={logout}>
-				退出	
-			</Menu.Item>
+			<Menu.Item key="logout" onClick={()=>{setLogoutVisible(true)}}>
+				退出
+				</Menu.Item>
 		</Menu>
 	);
 
@@ -124,10 +135,10 @@ const Navigator = () => {
 						<Link to="/pulish">发布商品</Link>
 					</div>
 					<div className={styles.desc}>
-						{userLogin ? (
+						{loginData.isAuth ? (
 							<Dropdown overlay={menu} placement="bottomRight">
 								<span className={styles.desc__user}>
-									学不完的前端
+									{loginData.user.nickname}
 									<span className={styles.desc__arrow}>
 										<DownOutlined />
 									</span>
@@ -154,6 +165,18 @@ const Navigator = () => {
 					</div>
 				</div>
 			</div>
+
+			<Modal
+				title="提示"
+				visible={logoutVisible}
+				onOk={logoutOk}
+				onCancel={logoutCancel}
+				cancelText="取消"
+				okText="确定"
+			>
+				<p>确定退出吗？</p>
+
+			</Modal>
 		</div>
 	);
 };

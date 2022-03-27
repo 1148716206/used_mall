@@ -1,47 +1,149 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { InputNumber, Menu, Divider, List, Avatar, Space, Button } from 'antd';
-import {Link} from 'react-router-dom'
+import {
+	InputNumber,
+	Table,
+	Menu,
+	Divider,
+	Popconfirm,
+	List,
+	Avatar,
+	Space,
+	Button,
+} from 'antd';
 import styles from './index.module.less';
 import empty from '../../assets/empty.png';
 import moment from 'moment';
-// import { connect } from 'react-redux';
-// import { bindActionCreators } from 'redux';
-// import { actionCreators } from './store';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { actionCreators } from './store';
 
 const Order = (props) => {
-	// const { user, getCartInfoFn } = props;
-	// console.log('user', user);
+	const { user, getOrderFn } = props;
+
 	const [cartStatus, setCartStatus] = useState(true);
-	const [cartList, setCartList] = useState([]);
+	const [orderList, setOrderList] = useState([]);
+	const [orderDetailList, setOrderDetailList] = useState([]);
 
-	// const getUser = async () => {
-	// 	const { data } = await getCartInfoFn.getCartInfo(user);
-	// 	console.log('cart', data);
-	// 	if (data.status === 200) {
-	// 		const cartData = data.data.map((item) => ({
-	// 			id: item.id,
-	// 			username: item.username,
-	// 			goods_img: item.goods_img,
-	// 			goods_price: item.goods_price,
-	// 			create_time: moment(item.create_time).format(
-	// 				'YYYY-MM-DD HH:mm:ss'
-	// 			),
-	// 			goods_count: item.goods_count,
-	// 		}));
+	const getOrder = async () => {
+		const { data } = await getOrderFn.getOrder({ username: user.username });
+		console.log('order', data);
+		if (data && data.status === 200) {
+			new Promise((resolve, reject) => {
+				const orderListData = data.data.map((item) => ({
+					key: item.id,
+					id: item.id,
+					username: item.username,
+					goods_list: JSON.parse(item.goods_list),
+				}));
+				console.log('所有大订单', orderListData);
+				setOrderList(orderListData);
+				console.log('111');
+				resolve();
+			}).then(() => {
 
-	// 		setCartList(cartData);
-	// 	}
-	// };
+					const orderDetail = orderList.map((item) => (
+						console.log('item',item),	[
+								item.goods_list.map((order) => (
+									console.log('order',order),	{
+									key: order.key,
+									id: order.key,
+									username: order.username,
+									goods_id: order.goods_id,
+									goods_img: order.goods_img,
+									goods_name: order.goods_name,
+									goods_count: order.goods_count,
+									create_time: order.create_time,
+								})),
+						]
+						)
+					);
+					console.log('333');
+					console.log('每个订单详情', orderDetail);
+	
+					setOrderDetailList(orderDetail);
+		
+			
+			});
+		}
+	};
+
+
+	const rowSelection = {
+		onChange: (selectedRowKeys, selectedRows) => {
+			console.log(
+				`selectedRowKeys: ${selectedRowKeys}`,
+				'selectedRows: ',
+				selectedRows
+			);
+		},
+	};
+
 	useEffect(() => {
-		// getUser();
+		getOrder();
 	}, []);
 
-	const IconText = (icon, text) => (
-		<Space>
-			{React.createElement(icon)}
-			{text}
-		</Space>
-	);
+	const columns = [
+		{
+			title: '商品图片',
+			key: 'goods_img',
+			dataIndex: 'goods_img',
+			width: 150,
+			render: (v) => <img src={v} style={{ width: 80, height: 50 }} />,
+		},
+		{
+			title: '商品名称',
+			key: 'goods_name',
+			dataIndex: 'goods_name',
+		},
+
+		{
+			title: '单价',
+			key: 'goods_price',
+			dataIndex: 'goods_price',
+			render: (v) => `￥：${v}`,
+		},
+		{
+			title: '数量',
+			key: 'goods_count',
+			dataIndex: 'goods_count',
+
+			render: (v, row) => (
+				<div
+					onClick={() => {
+						// getChangeId(row.goods_id);
+					}}
+				>
+					<InputNumber
+						min={1}
+						defaultValue={v}
+						// onChange={numberChange}
+					/>
+				</div>
+			),
+		},
+		{
+			title: '操作',
+			key: 'goods_id',
+			dataIndex: 'goods_id',
+			render: (goods_id) => (
+				<>
+					<Popconfirm
+						title="是否删除该商品？"
+						onConfirm={() => {
+							// deleteGoods(goods_id);
+						}}
+						okText="Yes"
+						cancelText="No"
+					>
+						<Button type="danger" style={{ padding: '4px 8px' }}>
+							删除
+						</Button>
+					</Popconfirm>
+					,
+				</>
+			),
+		},
+	];
 
 	return (
 		<div className={styles.cart_body}>
@@ -54,129 +156,25 @@ const Order = (props) => {
 								mode="horizontal"
 								defaultSelectedKeys={['1']}
 							>
-								<Menu.Item key="1">
-									全部订单
-								</Menu.Item>
-								<Menu.Item key="2">
-									待发货
-								</Menu.Item>
-								<Menu.Item key="3">
-									待收货
-								</Menu.Item>
-								<Menu.Item key="4">
-									待评价
-								</Menu.Item>
+								<Menu.Item key="1">全部订单</Menu.Item>
+								<Menu.Item key="2">待发货</Menu.Item>
+								<Menu.Item key="3">待收货</Menu.Item>
+								<Menu.Item key="4">待评价</Menu.Item>
 							</Menu>
 							<span className={styles.switch_cart_number}>
 								{cartStatus}
 							</span>
 						</div>
-						<div className={styles.cart_thead}>
-							<div
-								className={`${styles.column} ${styles.t_checkbox}`}
-							>
-								<div className={styles.cart_checkbox}>
-									<input
-										type="checkbox"
-										name="select-all"
-										className={styles.input_checkbox}
-									/>
-								</div>
-								全选
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_goods}`}
-							>
-								商品
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_props}`}
-							>
-								&nbsp;
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_quantity}`}
-							>
-								数量
-							</div>
-							<div className={`${styles.column} ${styles.t_sum}`}>
-								金额
-							</div>
-							<div className={`${styles.column} ${styles.t_sum}`}>
-								状态
-							</div>
-							<div
-								className={`${styles.column} ${styles.t_action}`}
-							>
-								操作
-							</div>
-						</div>
 						<div className={styles.cart_tbody}>
-							<div className={styles.item_list}>
-								{cartList
-									? cartList.map((item) => (
-											<li className={styles.sing_li}>
-												<div className={styles.check}>
-													<span>
-														<input
-															type="checkbox"
-															readOnly
-														/>
-													</span>
-												</div>
-												<div
-													className={styles.goods_img}
-												>
-													<div
-														className={styles.left}
-													>
-														<img
-															src="http://www.cz2000.top/bs/admin/images/ByteDance-cup-1.jpg"
-															alt=""
-														/>
-													</div>
-													<div
-														className={styles.right}
-													>
-														<p>{`item.name`}</p>
-													</div>
-												</div>
-												<div
-													className={
-														styles.single_price
-													}
-												>
-													￥：
-													<span>
-														{item.goods_price}
-													</span>
-													元
-												</div>
-												<div className={styles.number}>
-													<InputNumber
-														defaultValue={
-															item.goods_count
-														}
-													/>
-												</div>
-												<div
-													className={styles.subtotal}
-												>
-													￥：
-													<span>
-														{item.goods_price *
-															item.goods_count}
-													</span>
-													元
-												</div>
-												<div className={styles.operate}>
-													<Button type="danger">
-														删除
-													</Button>
-												</div>
-											</li>
-									  ))
-									: null}
+							<div>
+								<Table
+									rowSelection={{
+										...rowSelection,
+									}}
+									columns={columns}
+									dataSource={orderDetailList}
+									// pagination={false}
+								/>
 							</div>
 						</div>
 					</Fragment>
@@ -195,18 +193,16 @@ const Order = (props) => {
 	);
 };
 
-// const mapStateToProps = (state) => {
-// 	return {
-// 		user: state.login.user,
-// 	};
-// };
+const mapStateToProps = (state) => {
+	return {
+		user: state.login.user,
+	};
+};
 
-// const mapDispatchToProps = (dispatch) => {
-// 	return {
-// 		getCartInfoFn: bindActionCreators(actionCreators, dispatch),
-// 		// getGoodsMessageFn: bindActionCreators(actionCreators, dispatch),
-// 	};
-// };
-// export default connect(mapStateToProps, mapDispatchToProps)(Cart);
-
-export default Order;
+const mapDispatchToProps = (dispatch) => {
+	return {
+		getOrderFn: bindActionCreators(actionCreators, dispatch),
+		// getGoodsMessageFn: bindActionCreators(actionCreators, dispatch),
+	};
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Order);

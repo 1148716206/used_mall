@@ -18,7 +18,6 @@ export const syncInfoAc = data => {
 export const logout = data => {
     return dispatch => {
         localStorage.removeItem('@#@TOKEN');
-        console.log('out');
         dispatch(syncInfoAc({}));
     };
 };

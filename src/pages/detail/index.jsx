@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './index.module.less';
 import robot from '../../assets/robot.png';
-import { Button, Popconfirm, InputNumber,Pagination  } from 'antd';
+import { Button, Popconfirm, InputNumber,Pagination, message  } from 'antd';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { connect } from 'react-redux';
@@ -10,10 +10,11 @@ import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
 
 const Detail = (props) => {
+	const {user,addCartFn} = props
 	const pramas = useParams();
-
+	console.log(pramas);
 	const { getGoodsDetailFn, getGoodsMessageFn } = props;
-
+	const [chooseCount, setChooseCount] = useState(1)
 	const [goodsInfo, setGoodsInfo] = useState({
 		goods_id: '',
 		goods_img: '',
@@ -84,7 +85,30 @@ const Detail = (props) => {
 			setGoodsMessaga(messageData);
 		}
 	};
+	
+	const addGoodsToCart = async() => {
+		const addData = {
+			goods_id: goodsInfo.goods_id,
+			goods_img: goodsInfo.goods_img,
+			goods_price: goodsInfo.new_price,
+			goods_count:chooseCount,
+			goods_name: goodsInfo.goods_name,
+			username: user.username,
+		}
+		console.log(addData)
+		const { data } = await addCartFn.addCart(addData);
+		if(data && data.status === 200) {
+			setTimeout(() => {
+				message.success(data.msg)
+			},500)
 
+		}
+	}
+
+	const numberChange = (e) => {
+		// console.log(changeItem)
+		setChooseCount(e)
+	};
 
 
 
@@ -168,12 +192,14 @@ const Detail = (props) => {
 							min={1}
 							max={goodsInfo.goods_number}
 							defaultValue={1}
+							onChange={numberChange}
 						/>
 						<Button
 							size="large"
 							type="primary"
 							danger
 							className={styles.add_button}
+							onClick={addGoodsToCart}
 						>
 							加入购物车
 						</Button>
@@ -242,6 +268,7 @@ const mapDispatchToProps = (dispatch) => {
 	return {
 		getGoodsDetailFn: bindActionCreators(actionCreators, dispatch),
 		getGoodsMessageFn: bindActionCreators(actionCreators, dispatch),
+		addCartFn: bindActionCreators(actionCreators, dispatch),
 	};
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Detail);

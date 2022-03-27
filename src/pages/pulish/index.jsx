@@ -16,10 +16,29 @@ import {
 	InputNumber,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import store from "../../store";
+import decode from 'jwt-decode';
+import { syncInfoAc } from '../login/store/actionCreators'
+
+
+
+
 const { Dragger } = Upload;
 
 
 const Pulish = (props) => {
+	const isLogin = () => {
+		const token = localStorage.getItem('@#@TOKEN');
+		if(!token) {
+			message.error('没有权限，请登录')
+			setTimeout(() => {
+					window.location.href = '/login';  
+			}, 1000);
+		} 
+	}
+
+
+
 	const { pulishGoodsFn, user } = props;
 	const [goodsInfo, setGoodsInfo] = useState({
 		nickname: '',
@@ -125,12 +144,16 @@ const Pulish = (props) => {
 		}
 	};
 
+	useEffect(() => {
+		isLogin()
+	},[])
+
 
 	return (
 		<div className={styles.detail_body}>
 			<div className={styles.img_box}>
 			<Dragger
-						style={{ borderRadius: '50%' }}
+	
 						name="avator"
 						// headers={{
 						//   'X-Requested-With': null,
@@ -139,10 +162,10 @@ const Pulish = (props) => {
 						showUploadList={false}
 						onChange={hasPicUpload}
 					>
+						<PlusOutlined/>
 						<img role="presentation" src={''} alt="" />
 					</Dragger>
 			</div>
-			发布商品发布商品发布商品发布商品发布商品发布商品发布商品发布商品
 			<div className={styles.content_box}>
 				<Form
 					{...formItemLayout}

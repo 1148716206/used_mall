@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './index.module.less';
-import { Input, Button, Upload, Carousel, Modal, message,Pagination  } from 'antd';
+import { Input, Button, Upload, Modal, message,Pagination  } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SearchOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -9,7 +9,6 @@ import { bindActionCreators } from 'redux';
 import { actionCreators as getGoodsInfoActionCreators } from './store';
 import axios from '../../utils/request';
 // 导航
-import Navigator from '../navigator';
 import logo from '../../assets/home_logo.jpg';
 const { Dragger } = Upload;
 const Home = (props) => {
