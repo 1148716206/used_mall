@@ -26,19 +26,35 @@ const Order = (props) => {
 
 	const getOrder = async () => {
 		const { data } = await getOrderFn.getOrder({ username: user.username });
-		console.log('order', data);
 		if (data && data.status === 200) {
-			let orderListData = [];
-			data.data.flat(1).map((item) => {
-				const data = JSON.parse(item.goods_list);
-				data.forEach((item) => {
-					item.sum = item.goods_price * item.goods_count;
-				});
-				orderListData.push(data);
-			});
+			// let orderListData = [];
+			// data.data.flat(1).map((item) => {
+			// 	const data = JSON.parse(item.goods_list);
+			// 	data.forEach((item) => {
+			// 		item.sum = item.goods_price * item.goods_count;
+			// 	});
+			// 	orderListData.push(data);
+			// });
 
-			console.log('所有大订单', orderListData.flat(1));
-			setOrderList(orderListData.flat(1));
+			// console.log('所有大订单', orderListData.flat(1));
+			// setOrderList(orderListData.flat(1));
+
+			const orderListData = data.data.map((item) => {
+				const goods = JSON.parse(item.goods_list)[0];
+				return {
+					...item,
+					goods_id: goods.goods_id,
+					goods_img: goods.goods_img,
+					goods_name: goods.goods_name,
+					goods_price: goods.goods_price,
+					goods_count: goods.goods_count,
+					create_time: goods.create_time,
+					sum: goods.goods_price * goods.goods_count,
+					goods_list: null, //类似于flat()
+				};
+			});
+			console.log(orderListData);
+			setOrderList(orderListData);
 		}
 	};
 
@@ -98,10 +114,13 @@ const Order = (props) => {
 			key: 'goods_id',
 			dataIndex: 'goods_id',
 			align: 'center',
-			width:180,
+			width: 180,
 			render: (goods_id) => (
 				<>
-					<Button type="primary" style={{ padding: '4px 8px',marginRight:20 }}>
+					<Button
+						type="primary"
+						style={{ padding: '4px 8px', marginRight: 20 }}
+					>
 						支付
 					</Button>
 					<Popconfirm
