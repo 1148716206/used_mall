@@ -28,45 +28,19 @@ const Order = (props) => {
 		const { data } = await getOrderFn.getOrder({ username: user.username });
 		console.log('order', data);
 		if (data && data.status === 200) {
-			new Promise((resolve, reject) => {
-				const orderListData = data.data.map((item) => ({
-					key: item.id,
-					id: item.id,
-					username: item.username,
-					goods_list: JSON.parse(item.goods_list),
-				}));
-				console.log('所有大订单', orderListData);
-				setOrderList(orderListData);
-				console.log('111');
-				resolve();
-			}).then(() => {
-
-					const orderDetail = orderList.map((item) => (
-						console.log('item',item),	[
-								item.goods_list.map((order) => (
-									console.log('order',order),	{
-									key: order.key,
-									id: order.key,
-									username: order.username,
-									goods_id: order.goods_id,
-									goods_img: order.goods_img,
-									goods_name: order.goods_name,
-									goods_count: order.goods_count,
-									create_time: order.create_time,
-								})),
-						]
-						)
-					);
-					console.log('333');
-					console.log('每个订单详情', orderDetail);
-	
-					setOrderDetailList(orderDetail);
-		
-			
+			let orderListData = [];
+			data.data.flat(1).map((item) => {
+				const data = JSON.parse(item.goods_list);
+				data.forEach((item) => {
+					item.sum = item.goods_price * item.goods_count;
+				});
+				orderListData.push(data);
 			});
+
+			console.log('所有大订单', orderListData.flat(1));
+			setOrderList(orderListData.flat(1));
 		}
 	};
-
 
 	const rowSelection = {
 		onChange: (selectedRowKeys, selectedRows) => {
@@ -95,7 +69,6 @@ const Order = (props) => {
 			key: 'goods_name',
 			dataIndex: 'goods_name',
 		},
-
 		{
 			title: '单价',
 			key: 'goods_price',
@@ -106,40 +79,43 @@ const Order = (props) => {
 			title: '数量',
 			key: 'goods_count',
 			dataIndex: 'goods_count',
+		},
+		{
+			title: '合计',
 
-			render: (v, row) => (
-				<div
-					onClick={() => {
-						// getChangeId(row.goods_id);
-					}}
-				>
-					<InputNumber
-						min={1}
-						defaultValue={v}
-						// onChange={numberChange}
-					/>
-				</div>
-			),
+			key: `sum`,
+			dataIndex: `sum`,
+			render: (v) => `￥：${v}`,
+		},
+		{
+			title: '状态',
+			key: `sum`,
+			dataIndex: `sum`,
+			render: () => `待支付`,
 		},
 		{
 			title: '操作',
 			key: 'goods_id',
 			dataIndex: 'goods_id',
+			align: 'center',
+			width:180,
 			render: (goods_id) => (
 				<>
+					<Button type="primary" style={{ padding: '4px 8px',marginRight:20 }}>
+						支付
+					</Button>
 					<Popconfirm
 						title="是否删除该商品？"
 						onConfirm={() => {
 							// deleteGoods(goods_id);
 						}}
-						okText="Yes"
-						cancelText="No"
+						okText="确定"
+						cancelText="取消"
 					>
 						<Button type="danger" style={{ padding: '4px 8px' }}>
 							删除
 						</Button>
 					</Popconfirm>
-					,
 				</>
 			),
 		},
@@ -172,7 +148,7 @@ const Order = (props) => {
 										...rowSelection,
 									}}
 									columns={columns}
-									dataSource={orderDetailList}
+									dataSource={orderList}
 									// pagination={false}
 								/>
 							</div>
