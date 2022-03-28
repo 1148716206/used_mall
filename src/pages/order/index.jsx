@@ -7,7 +7,7 @@ import {
 	Popconfirm,
 	List,
 	Avatar,
-	Space,
+	message,
 	Button,
 } from 'antd';
 import styles from './index.module.less';
@@ -18,7 +18,7 @@ import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
 
 const Order = (props) => {
-	const { user, getOrderFn } = props;
+	const { user, getOrderFn,deleteOrderFn } = props;
 
 	const [cartStatus, setCartStatus] = useState(true);
 	const [orderList, setOrderList] = useState([]);
@@ -50,7 +50,7 @@ const Order = (props) => {
 					goods_count: goods.goods_count,
 					create_time: goods.create_time,
 					sum: goods.goods_price * goods.goods_count,
-					goods_list: null, //类似于flat()
+					goods_list: null, //类似于flat() 删除goods_list
 				};
 			});
 			console.log(orderListData);
@@ -68,6 +68,23 @@ const Order = (props) => {
 		},
 	};
 
+	const deleteOrder = async (id) => {
+
+		const { data } = await deleteOrderFn.deleteOrder({ id });
+
+
+		if (data && data.status === 200) {
+			setTimeout(() => {
+				message.success(data.msg);
+			}, 500);
+		}
+	};
+
+	const payPages = () => {
+
+		message.success('正在跳转到支付页面')
+	}
+	
 	useEffect(() => {
 		getOrder();
 	}, []);
@@ -111,22 +128,25 @@ const Order = (props) => {
 		},
 		{
 			title: '操作',
-			key: 'goods_id',
-			dataIndex: 'goods_id',
+			key: 'id',
+			dataIndex: 'id',
 			align: 'center',
 			width: 180,
-			render: (goods_id) => (
+			render: (id) => (
 				<>
 					<Button
 						type="primary"
 						style={{ padding: '4px 8px', marginRight: 20 }}
+						onClick={() => {
+							payPages(id);
+						}}
 					>
 						支付
 					</Button>
 					<Popconfirm
 						title="是否删除该商品？"
 						onConfirm={() => {
-							// deleteGoods(goods_id);
+							deleteOrder(id);
 						}}
 						okText="确定"
 						cancelText="取消"
@@ -197,6 +217,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		getOrderFn: bindActionCreators(actionCreators, dispatch),
+		deleteOrderFn: bindActionCreators(actionCreators, dispatch),
 		// getGoodsMessageFn: bindActionCreators(actionCreators, dispatch),
 	};
 };

@@ -69,6 +69,7 @@ const Cart = (props) => {
 		const { data } = await updateCartNumberFn.updateCartNumber({
 			goods_id: changeItem,
 			goods_count: e,
+			username:user.username
 		});
 		if (data && data.status === 200) {
 			setTimeout(() => {
@@ -80,7 +81,10 @@ const Cart = (props) => {
 	};
 
 	const deleteGoods = async (goods_id) => {
-		const { data } = await deleteCartInfoFn.deleteCartInfo({ goods_id });
+		const { data } = await deleteCartInfoFn.deleteCartInfo({ 
+			goods_id,
+			username:user.username
+		});
 		if (data && data.status === 200) {
 			setTimeout(() => {
 				message.success(data.msg);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './index.module.less';
-import { Input, Button, Upload, Modal, message,Pagination  } from 'antd';
+import { Input, Button, Upload, Modal, message,Pagination,Empty   } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { SearchOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
@@ -12,13 +12,14 @@ import axios from '../../utils/request';
 import logo from '../../assets/home_logo.jpg';
 const { Dragger } = Upload;
 const Home = (props) => {
+	const { goodsInfoFn,searchGoodsFn } = props;
+
 	const [editShow, setEditShow] = useState(false);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [managerInfoModal, setManagerInfoModal] = useState({ avatar: '' });
 	const [updateLoading, setUpdateLoading] = useState(false);
-
 	const [goodsList, setGoodsList] = useState([]);
-	const { goodsInfoFn } = props;
+	const [searchInfo, setSearchInfo] = useState('')
 
 	const getGoodsList = async () => {
 		const { data } = await goodsInfoFn.getGoodsInfo();
@@ -66,12 +67,22 @@ const Home = (props) => {
 		}
 	};
 
-	const nicknameChange = (e) => {
-		// setManagerInfoModal({
-		//   ...managerInfoModal,
-		//   nickname: e.target.value,
-		// });
-	};
+	const onSearchEdit = e => {
+		const val = e.target.value.trimStart();
+		setSearchInfo(val);
+};
+
+const searchGoods = async () => {
+
+	const {data} = await searchGoodsFn.searchGoods({
+		goods_name:searchInfo
+	});
+	if(data.status === 200) {
+		setGoodsList(data.data);
+	}
+}
+
+console.log('goodsList',goodsList);
 
 	const toggleManagerInfoModal = (val) => {
 		if (val) {
@@ -84,7 +95,6 @@ const Home = (props) => {
 				avatar: '',
 			});
 		}
-
 		setEditShow(false);
 	};
 
@@ -102,8 +112,8 @@ const Home = (props) => {
 					</div>
 					<div className={styles.search_search_box}>
 						<div className={styles.block}>
-							<input />
-							<button>
+							<input val={searchInfo} onChange={onSearchEdit} />
+							<button onClick={searchGoods}>
 								<SearchOutlined />
 							</button>
 						</div>
@@ -122,7 +132,7 @@ const Home = (props) => {
 							</span>
 						</div>
 						<div className={styles.recommend__list}>
-							{goodsList
+							{goodsList.length !== 0
 								? goodsList.map((item, id) => (
 										<Link
 											target="_blank"
@@ -173,7 +183,11 @@ const Home = (props) => {
 											</div>
 										</Link>
 								  ))
-								: null}
+								:
+								<div style={{margin:'0 auto'}}>
+									 <Empty description="暂无该商品" style={{color:'#ccc'}}/>
+								</div> 
+								}
 						</div>
 					</div>
 					<div style={{float:"right",marginTop:20}}>
@@ -276,6 +290,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		goodsInfoFn: bindActionCreators(getGoodsInfoActionCreators, dispatch),
+		searchGoodsFn: bindActionCreators(getGoodsInfoActionCreators, dispatch),
 	};
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

@@ -138,7 +138,7 @@ const Navigator = (props) => {
 						{loginData.isAuth ? (
 							<Dropdown overlay={menu} placement="bottomRight">
 								<span className={styles.desc__user}>
-									{loginData.user.nickname}
+									{loginData.user.nickname || loginData.user.username}
 									<span className={styles.desc__arrow}>
 										<DownOutlined />
 									</span>

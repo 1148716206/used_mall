@@ -2,14 +2,12 @@ import axios from '../../../utils/request'
 
 
 export const getGoodsDetail = data => {
-console.log(data);
   return dispatch => {
     return axios.post('/api/detail/getGoodsDetail', data)
   }
 }
 
 export const getGoodsMessage = data => {
-  console.log(data);
     return dispatch => {
       return axios.post('/api/detail/getGoodsMessage', data)
     }
@@ -20,5 +18,12 @@ export const getGoodsMessage = data => {
         return axios.post('/api/cart/addCart', data);
     };
 };
+
+export const addMessage = data => {
+  return dispatch => {
+      return axios.post('/api/detail/addMessage', data);
+  };
+};
+
 
 

@@ -5,3 +5,9 @@ export const getGoodsInfo = data => {
     return axios.get('/api/getGoodsInfo')
   }
 }
+
+export const searchGoods = data => {
+  return dispatch => {
+    return axios.post('/api/searchGoods',data)
+  }
+}

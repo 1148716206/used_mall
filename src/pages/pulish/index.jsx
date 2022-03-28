@@ -16,30 +16,25 @@ import {
 	InputNumber,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import store from "../../store";
+import store from '../../store';
 import decode from 'jwt-decode';
-import { syncInfoAc } from '../login/store/actionCreators'
-
-
-
+import { syncInfoAc } from '../login/store/actionCreators';
+import moment from 'moment';
 
 const { Dragger } = Upload;
-
 
 const Pulish = (props) => {
 	const isLogin = () => {
 		const token = localStorage.getItem('@#@TOKEN');
-		if(!token) {
-			message.error('没有权限，请登录')
+		if (!token) {
+			message.error('没有权限，请登录');
 			setTimeout(() => {
-					window.location.href = '/login';  
+				window.location.href = '/login';
 			}, 1000);
-		} 
-	}
+		}
+	};
 
-
-
-	const { pulishGoodsFn, user } = props;
+	const { pulishGoodsFn, pulishGoodsImgFn, user } = props;
 	const [goodsInfo, setGoodsInfo] = useState({
 		nickname: '',
 		username: '',
@@ -47,6 +42,8 @@ const Pulish = (props) => {
 		email: '',
 		address: '',
 	});
+	const [uploadGoodsInfo, setUploadGoodsInfo] = useState({ goods_id: 0 });
+	const [uploadGoodsImg, setUploadGoodsImg] = useState(null);
 	const [formObject] = Form.useForm();
 
 	const formItemLayout = {
@@ -61,54 +58,31 @@ const Pulish = (props) => {
 			</div>
 		);
 	};
-	const fileList = [
-		{
-			uid: '-1',
-			name: 'image.png',
-			status: 'done',
-			url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-		},
-		{
-			uid: '-2',
-			name: 'image.png',
-			status: 'done',
-			url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-		},
-		{
-			uid: '-3',
-			name: 'image.png',
-			status: 'done',
-			url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-		},
-		{
-			uid: '-4',
-			name: 'image.png',
-			status: 'done',
-			url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-		},
-		{
-			uid: '-xxx',
-			percent: 50,
-			name: 'image.png',
-			status: 'uploading',
-			url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-		},
-		{
-			uid: '-5',
-			name: 'image.png',
-			status: 'error',
-		},
-	];
 
 	const pulish = async () => {
 		const formData = await formObject.getFieldsValue();
-		const data = {
+		
+		const pulishData = {
 			...formData,
+			goods_id:uploadGoodsInfo.goods_id,
 			username: user.username,
+			create_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
 		};
-		const { status } = await pulishGoodsFn.pulishGoods(data);
 
+		const { data } = await pulishGoodsFn.pulishGoods(pulishData);
+		console.log('data',data);
+		if(data.status === 200) {
+			setTimeout(() => {
+				message.success('发布成功，跳转至首页！');
+			
+			}, 500);
+			setTimeout(() => {
+
+				window.location.href = '/'
+			}, 1500);
+		}
 	};
+	const getUploadImg = () => {};
 
 	const checkPicUpload = async (file) => {
 		if (
@@ -128,43 +102,51 @@ const Pulish = (props) => {
 		let formData = new FormData();
 		formData.append('images', file);
 
-		// const { data } = await setUserAvatarFn.setUserAvatar(formData);
-		// console.log(data);
-	};
-	const hasPicUpload = ({ file }) => {
-		console.log(file)
-		if (file.status === 'error') {
-			message.error('图片上传失败');
-		}
-		if (file.status === 'done') {
-			message.success('图片上传成功');
-			// setManagerInfoModal({
-			//   avatar: `${formAction.filepath}${file.response.url}`,
-			// });
-		}
-	};
+		const data = await pulishGoodsImgFn.pulishGoodsImg(formData);
+		console.log('data', data);
 
+		if (data.status === 200) {
+			setUploadGoodsImg(
+				'data:image/png;base64,' +
+					btoa(
+						new Uint8Array(data.data).reduce(
+							(data, byte) => data + String.fromCharCode(byte),
+							''
+						)
+					)
+			);
+			setUploadGoodsInfo({goods_id:parseInt(data.headers.goods_id)})
+			setTimeout(() => {
+				message.success('上传成功');
+			}, 500);
+		}
+	};
 	useEffect(() => {
-		isLogin()
-	},[])
-
+		isLogin();
+	}, []);
 
 	return (
 		<div className={styles.detail_body}>
 			<div className={styles.img_box}>
-			<Dragger
-	
-						name="avator"
-						// headers={{
-						//   'X-Requested-With': null,
-						// }}
-						beforeUpload={checkPicUpload}
-						showUploadList={false}
-						onChange={hasPicUpload}
-					>
-						<PlusOutlined/>
-						<img role="presentation" src={''} alt="" />
-					</Dragger>
+				<Dragger
+					name="avator"
+					// headers={{
+					//   'X-Requested-With': null,
+					// }}
+					beforeUpload={checkPicUpload}
+					showUploadList={false}
+				>
+					{uploadGoodsImg ? (
+						<img
+							role="presentation"
+							src={uploadGoodsImg}
+							style={{ width: '381px', height: '381px' }}
+							alt=""
+						/>
+					) : (
+						<PlusOutlined />
+					)}
+				</Dragger>
 			</div>
 			<div className={styles.content_box}>
 				<Form
@@ -317,6 +299,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		pulishGoodsFn: bindActionCreators(actionCreators, dispatch),
+		pulishGoodsImgFn: bindActionCreators(actionCreators, dispatch),
 	};
 };
 

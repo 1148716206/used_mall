@@ -2,19 +2,33 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './index.module.less';
 import robot from '../../assets/robot.png';
-import { Button, Popconfirm, InputNumber,Pagination, message  } from 'antd';
+import {
+	Button,
+	Popconfirm,
+	InputNumber,
+	Pagination,
+	Input,
+	message,
+	Form,
+	Modal,
+
+} from 'antd';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
+const { TextArea } = Input;
 
 const Detail = (props) => {
-	const {user,addCartFn} = props
+	const { user, addCartFn,addMessageFn } = props;
 	const pramas = useParams();
-	console.log(pramas);
+	console.log('user',user);
+	const [formObject] = Form.useForm();
 	const { getGoodsDetailFn, getGoodsMessageFn } = props;
-	const [chooseCount, setChooseCount] = useState(1)
+	const [chooseCount, setChooseCount] = useState(1);
+	const [questionVisible, setQuestionVisible] = useState(false);
+	const [editAnswer, setEditAnswer] = useState('');
 	const [goodsInfo, setGoodsInfo] = useState({
 		goods_id: '',
 		goods_img: '',
@@ -29,12 +43,12 @@ const Detail = (props) => {
 	});
 
 	const [pagination, setPagination] = useState({
-    current: 1,
-    total: 1,
-    pageSize: 10,
-    showSizeChanger: true,
-    pageSizeOptions: ['10', '50', '200', '500'],
-  });
+		current: 1,
+		total: 1,
+		pageSize: 10,
+		showSizeChanger: true,
+		pageSizeOptions: ['10', '50', '200', '500'],
+	});
 	const [goodsMessage, setGoodsMessaga] = useState([]);
 
 	const [messageList, setMessageList] = useState([
@@ -85,37 +99,69 @@ const Detail = (props) => {
 			setGoodsMessaga(messageData);
 		}
 	};
-	
-	const addGoodsToCart = async() => {
+
+	const addGoodsToCart = async () => {
 		const addData = {
 			goods_id: goodsInfo.goods_id,
 			goods_img: goodsInfo.goods_img,
 			goods_price: goodsInfo.new_price,
-			goods_count:chooseCount,
+			goods_count: chooseCount,
 			goods_name: goodsInfo.goods_name,
 			username: user.username,
-		}
-		console.log(addData)
+		};
+		console.log(addData);
 		const { data } = await addCartFn.addCart(addData);
-		if(data && data.status === 200) {
+		if (data && data.status === 200) {
 			setTimeout(() => {
-				message.success(data.msg)
-			},500)
-
+				message.success(data.msg);
+			}, 500);
 		}
-	}
+	};
 
 	const numberChange = (e) => {
 		// console.log(changeItem)
-		setChooseCount(e)
+		setChooseCount(e);
 	};
-
-
 
 	useEffect(() => {
 		getGoodsDetail();
 		getGoodsMessage();
 	}, []);
+
+	const questionOk = async () => {
+		const time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+		console.log('xx',{
+			content:editAnswer,
+			create_time:time,
+			username:user.username,
+			goods_id: parseInt(pramas.goods_id)
+		});
+		
+		const {data} = await addMessageFn.addMessage({
+			content:editAnswer,
+			create_time:time,
+			username:user.username,
+			goods_id: parseInt(pramas.goods_id)
+		});
+		console.log('data',data);
+		if (data && data.status === 200) {
+		
+			setTimeout(() => {
+				message.success(data.msg);
+			}, 500);
+			setQuestionVisible(false);
+		}
+
+	};
+
+	const questionCancel = () => {
+		setQuestionVisible(false);
+	};
+	const onEditAnswer = e => {
+		const val = e.target.value.trimStart();
+		setEditAnswer(val);
+};
+
 
 	return (
 		<Fragment>
@@ -207,54 +253,91 @@ const Detail = (props) => {
 				</div>
 			</div>
 			<div className={styles.message_body}>
-				<div className={styles.message_title}>留言：</div>
+				<div className={styles.message_title}>
+					留言：
+				</div>
+				<Button className={styles.message_button} type="primary" onClick={() => setQuestionVisible(true)}>
+					我要留言
+				</Button>
 				<ul className={styles.modal_box_message}>
-		
-						{goodsMessage
-							? goodsMessage.map((item) => (
-									<li
-										className={
-											styles.modal_box_message_user
-										}
-										key={item.id}
-									>
-										<img
-											src={robot}
-											role="presentation"
-											alt="头像"
-										/>
-										<sapn>{item.username}</sapn>
-										{item.type === 'officialAnswer' ? (
-											<span className={styles.official}>
-												官方
-											</span>
-										) : null}
-										<span>：</span>
-										<div className={styles.content}>
-											<p>{item.content}</p>
-										</div>
-										<div className={styles.time}>
-											{/* <span>{moment(item.createdAt).format('MM-DD HH:mm')}</span> */}
-											<span>2022-02-15 15:51</span>
-											<Popconfirm
-												title="确定要删除该留言吗？"
-												// onConfirm={() =>
-												// 	deleteAnswer(item.id)
-												// }
-												okText="确定"
-												cancelText="取消"
-											>
-												<Button type="link">
-													删除
-												</Button>
-											</Popconfirm>
-										</div>
-									</li>
-							  ))
-							: null}
-					
+					{goodsMessage
+						? goodsMessage.map((item) => (
+								<li
+									className={styles.modal_box_message_user}
+									key={item.id}
+								>
+									<img
+										src={robot}
+										role="presentation"
+										alt="头像"
+									/>
+									<sapn>{item.username}</sapn>
+									{item.type === 'officialAnswer' ? (
+										<span className={styles.official}>
+											官方
+										</span>
+									) : null}
+									<span>：</span>
+									<div className={styles.content}>
+										<p>{item.content}</p>
+									</div>
+									<div className={styles.time}>
+										{/* <span>{moment(item.createdAt).format('MM-DD HH:mm')}</span> */}
+										<span>2022-02-15 15:51</span>
+										<Popconfirm
+											title="确定要删除该留言吗？"
+											// onConfirm={() =>
+											// 	deleteAnswer(item.id)
+											// }
+											okText="确定"
+											cancelText="取消"
+										>
+											{
+												user.permission === 2 ?  <Button type="link">删除</Button> : null
+											}
+											
+										</Popconfirm>
+									</div>
+								</li>
+						  ))
+						: null}
 				</ul>
+				<Pagination
+					style={{ position: 'absolute', right: 0, bottom: 10 }}
+					defaultCurrent={1}
+					total={15}
+				/>
+				{/* <div className={styles.modal_box_answers_content} >
+					<TextArea
+							style={{ height:200,backgroundColor:'#f7f7f7' }}
+							// value={editAnswer}
+							// onChange={onEditAnswer}
+					/>
+				</div> */}
 			</div>
+
+			<Modal
+				title="留言"
+				visible={questionVisible}
+				onOk={questionOk}
+				onCancel={questionCancel}
+				cancelText="取消"
+				okText="确定"
+			>
+				<Form
+					labelCol={{ span: 8 }}
+					wrapperCol={{ span: 12 }}
+					className={styles.login_form}
+					form={formObject}
+					// onFinish={submit}
+				>
+					<TextArea
+						style={{ height: '200px' }}
+						value={editAnswer}
+						onChange={onEditAnswer}
+					/>
+				</Form>
+			</Modal>
 		</Fragment>
 	);
 };
@@ -269,6 +352,7 @@ const mapDispatchToProps = (dispatch) => {
 		getGoodsDetailFn: bindActionCreators(actionCreators, dispatch),
 		getGoodsMessageFn: bindActionCreators(actionCreators, dispatch),
 		addCartFn: bindActionCreators(actionCreators, dispatch),
+		addMessageFn: bindActionCreators(actionCreators, dispatch),
 	};
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Detail);

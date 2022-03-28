@@ -1,62 +1,58 @@
 .detail_body {
-  position: relative;
-  width: 1190px;
-  margin: 0 auto;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0 5px 14px 0 rgb(0 0 0 / 10%);
-  border-radius: 4px;
-  margin-top: 100px;
-  height: 659px;
+	position: relative;
+	width: 1190px;
+	margin: 0 auto;
+	background: #ffffff;
+	border: 1px solid #e5e5e5;
+	box-shadow: 0 5px 14px 0 rgb(0 0 0 / 10%);
+	border-radius: 4px;
+	margin-top: 100px;
+	height: 659px;
 
-  border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
 
+	.img_box {
+		position: absolute;
+		width: 385px;
+		height: 385px;
+		top: 100px;
+		left: 110px;
+		overflow: hidden;
+		border: 1px solid red;
+	}
+	.content_box {
+		position: absolute;
+		right: 100px;
+		top: 90px;
+		width: 400px;
+		height: 500px;
+		// border: 1px solid red;
+		&__item {
+			.info_title {
+				font-size: 20px;
+				font-weight: 700;
+			}
+		}
+		.goods_operate {
+			position: absolute;
+			right: 65px;
+			bottom: 40px;
 
-    .img_box{
-      position: absolute;
-      width: 385px;
-      height: 385px;
-      top: 100px;
-      left:110px;
-      overflow: hidden;
-      border: 1px solid red;
-
-    }
-    .content_box{
-      position: absolute;
-      right: 100px;
-      top: 90px;
-      width: 400px;
-      height: 500px;
-      // border: 1px solid red;
-      &__item{
-        .info_title{
-          font-size: 20px;
-          font-weight: 700;
-        }
-       }
-      .goods_operate{
-        position: absolute;
-        right: 65px;
-        bottom: 40px;
-
-        .add_button {
-        
-          background-color: red;
-          color: #ffffff;
-          height: 46px;
-          line-height: 46px;
-          font-weight: 700;
-          padding: 0 26px;
-          font-size: 18px;
-          font-family: "microsoft yahei";
-        
-        }
-      }
-  
-
-     
-      
-    }
-  
+			.add_button {
+				background-color: red;
+				color: #ffffff;
+				height: 46px;
+				line-height: 46px;
+				font-weight: 700;
+				padding: 0 26px;
+				font-size: 18px;
+				font-family: 'microsoft yahei';
+			}
+		}
+	}
+}
+:global {
+	.ant-upload.ant-upload-drag .ant-upload {
+		padding: 0;
+	}
 }

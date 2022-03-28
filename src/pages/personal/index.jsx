@@ -15,11 +15,13 @@ import styles from './index.module.less';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
+import robot from '../../assets/robot.png';
 
 const { Dragger } = Upload;
 
 const Personal = (props) => {
 	const {
+		user,
 		getUserDataFn,
 		setUserGenderFn,
 		setNickNameFn,
@@ -29,6 +31,7 @@ const Personal = (props) => {
 		setUserAvatarFn,
 		getAvatarFn,
 	} = props;
+
 	const [managerInfoModal, setManagerInfoModal] = useState({ avatar: '' });
 	const [modalObject, setModalObject] = useState({
 		id: 0,
@@ -48,8 +51,10 @@ const Personal = (props) => {
 	const [formObject] = Form.useForm();
 
 	const personData = async () => {
+		console.log('sss');
+		console.log(userInfo.username);
 		const { data } = await getUserDataFn.getUserData(userInfo.username);
-		console.log(data);
+
 	
 		if (data.status === 200) {
 			const userInfo = data.data[0];
@@ -80,7 +85,7 @@ const Personal = (props) => {
 	useEffect(() => {
 		personData();
 		getAvatar();
-	}, [avatar]);
+	}, []);
 
 	const changeGender = async (userInfo) => {
 		if (userInfo.gender == 1) userInfo.gender = 0;
@@ -125,7 +130,6 @@ const Personal = (props) => {
 			updateStatus = status;
 		}
 
-		console.log('updateStatus', updateStatus);
 		setModalObject({ visible: false });
 		if (updateStatus === 200) {
 			message.success('更换成功');
@@ -139,11 +143,7 @@ const Personal = (props) => {
 	};
 
 	const checkPicUpload = async (file) => {
-		if (
-			!~['image/jpg', 'image/png', 'image/gif', 'image/jpeg'].indexOf(
-				file.type
-			)
-		) {
+		if (!~['image/jpg', 'image/png', 'image/gif', 'image/jpeg'].indexOf(file.type)) {
 			message.error('上传图片格式错误');
 			return false;
 		}
@@ -152,17 +152,21 @@ const Personal = (props) => {
 			message.error('上传图片大小超过 4MB');
 			return false;
 		}
-		console.log('file', file);
 		let formData = new FormData();
 		formData.append('images', file);
-
 		const { data } = await setUserAvatarFn.setUserAvatar(formData);
-		console.log(data);
+		if(data.status===200) {
+			setTimeout(() => {
+				message.success(data.msg);
+			})
+		}
+		getAvatar()
+	
 	};
 	const hasPicUpload = ({ file }) => {
 		console.log(file)
 		if (file.status === 'error') {
-			message.error('图片上传失败');
+			// message.error('图片上传失败');
 		}
 		if (file.status === 'done') {
 			message.success('图片上传成功');
@@ -185,9 +189,9 @@ const Personal = (props) => {
 						// }}
 						beforeUpload={checkPicUpload}
 						showUploadList={false}
-						onChange={hasPicUpload}
+						// onChange={hasPicUpload}
 					>
-						<img role="presentation" src={avatar} alt="" />
+						<img role="presentation" src={avatar || user.avatar || robot} alt="" />
 					</Dragger>
 				</div>
 				<div className={styles.info_list}>
