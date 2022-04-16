@@ -8,7 +8,8 @@ import Personal from './pages/personal';
 // 购物车
 import Cart from './pages/cart'
 import Detail from './pages/detail'
-import Pulish from './pages/pulish'
+import Pulish from './pages/publish'
+import Pulished from './pages/published'
 // 注册
 import Register from './pages/register';
 import  Navigator from './pages/navigator';
@@ -32,7 +33,8 @@ export default class App extends Component {
 			<Router>
         <Navigator/>
 				<Routes>
-					<Route path="/pulish" data={this.state} element={<Pulish/>} />
+					<Route path="/publish" data={this.state} element={<Pulish/>} />
+					<Route path="/published" data={this.state} element={<Pulished/>} />
 					<Route path="/" data={this.state} exact element={<Home/>} />
 					<Route path="/cart" data={this.state} exact element={<Cart/>} />
 					<Route path="/personal" data={this.state} exact element={<Personal/>} />

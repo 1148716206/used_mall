@@ -16,6 +16,7 @@ import moment from 'moment';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
+import debounce from '../../utils/debounce';
 
 const Cart = (props) => {
 	const {
@@ -25,7 +26,7 @@ const Cart = (props) => {
 		updateCartNumberFn,
 		addOrderFn,
 	} = props;
-	const [cartStatus, setCartStatus] = useState(true);
+	const [numberStatus,setNumberStatus] = useState(false)
 	const [payVisible, setPayVisible] = useState(false);
 	const [cartList, setCartList] = useState([]);
 	const [changeItem, setChangeItem] = useState(0);
@@ -62,15 +63,13 @@ const Cart = (props) => {
 		}
 	};
 
-	const getChangeId = (val) => {
-		setChangeItem(val);
-	};
 	const numberChange = async (e) => {
 		const { data } = await updateCartNumberFn.updateCartNumber({
 			goods_id: changeItem,
 			goods_count: e,
 			username:user.username
 		});
+		setNumberStatus(!numberStatus)
 		if (data && data.status === 200) {
 			setTimeout(() => {
 				message.success(data.msg);
@@ -79,6 +78,7 @@ const Cart = (props) => {
 		//防抖函数
 		//判断数量
 	};
+	const debounceChange = debounce(numberChange, 500);
 
 	const deleteGoods = async (goods_id) => {
 		const { data } = await deleteCartInfoFn.deleteCartInfo({ 
@@ -86,9 +86,7 @@ const Cart = (props) => {
 			username:user.username
 		});
 		if (data && data.status === 200) {
-			setTimeout(() => {
 				message.success(data.msg);
-			}, 500);
 		}
 	};
 
@@ -111,7 +109,7 @@ const Cart = (props) => {
 
 	useEffect(() => {
 		getUser();
-	}, []);
+	}, [numberStatus]);
 
 	const columns = [
 		{
@@ -141,13 +139,13 @@ const Cart = (props) => {
 			render: (v, row) => (
 				<div
 					onClick={() => {
-						getChangeId(row.goods_id);
+						setChangeItem(row.goods_id);
 					}}
 				>
 					<InputNumber
 						min={1}
 						defaultValue={v}
-						onChange={numberChange}
+						onChange={debounceChange}
 					/>
 				</div>
 			),
@@ -163,8 +161,8 @@ const Cart = (props) => {
 						onConfirm={() => {
 							deleteGoods(goods_id);
 						}}
-						okText="Yes"
-						cancelText="No"
+						okText="确定"
+						cancelText="取消"
 					>
 						<Button type="danger" style={{ padding: '4px 8px' }}>
 							删除
@@ -288,12 +286,9 @@ const Cart = (props) => {
 						name="phone"
 						label="收货人电话"
 						initialValue={user.phone}
-						rules={[
-							{
-								required: true,
-								message: '收货人电话!',
-							},
-						]}
+						rules={[{required: true, message: '请输入电话号码'},
+						{min: 11, max: 11, message: '请输入正确的电话号码'}
+					]}
 					>
 						<Input
 							placeholder="请输入收货人电话"

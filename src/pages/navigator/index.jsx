@@ -132,7 +132,8 @@ const Navigator = (props) => {
 					<div className={styles.nav}>
 						<Link to="/">交易大厅</Link>
 						<Link to="/cart">购物车</Link>
-						<Link to="/pulish">发布商品</Link>
+						<Link to="/publish">发布商品</Link>
+						<Link to="/published">已发布商品</Link>
 					</div>
 					<div className={styles.desc}>
 						{loginData.isAuth ? (

@@ -34,7 +34,7 @@ const Pulish = (props) => {
 		}
 	};
 
-	const { pulishGoodsFn, pulishGoodsImgFn, user } = props;
+	const { publishGoodsFn, publishGoodsImgFn, user } = props;
 	const [goodsInfo, setGoodsInfo] = useState({
 		nickname: '',
 		username: '',
@@ -59,17 +59,16 @@ const Pulish = (props) => {
 		);
 	};
 
-	const pulish = async () => {
+	const publish = async () => {
 		const formData = await formObject.getFieldsValue();
-		
-		const pulishData = {
+		const publishData = {
 			...formData,
 			goods_id:uploadGoodsInfo.goods_id,
 			username: user.username,
 			create_time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
 		};
 
-		const { data } = await pulishGoodsFn.pulishGoods(pulishData);
+		const { data } = await publishGoodsFn.publishGoods(publishData);
 		console.log('data',data);
 		if(data.status === 200) {
 			setTimeout(() => {
@@ -77,12 +76,10 @@ const Pulish = (props) => {
 			
 			}, 500);
 			setTimeout(() => {
-
 				window.location.href = '/'
 			}, 1500);
 		}
 	};
-	const getUploadImg = () => {};
 
 	const checkPicUpload = async (file) => {
 		if (
@@ -102,7 +99,7 @@ const Pulish = (props) => {
 		let formData = new FormData();
 		formData.append('images', file);
 
-		const data = await pulishGoodsImgFn.pulishGoodsImg(formData);
+		const data = await publishGoodsImgFn.publishGoodsImg(formData);
 		console.log('data', data);
 
 		if (data.status === 200) {
@@ -280,7 +277,7 @@ const Pulish = (props) => {
 						type="primary"
 						danger
 						className={styles.add_button}
-						onClick={pulish}
+						onClick={publish}
 					>
 						发布商品
 					</Button>
@@ -298,8 +295,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		pulishGoodsFn: bindActionCreators(actionCreators, dispatch),
-		pulishGoodsImgFn: bindActionCreators(actionCreators, dispatch),
+		publishGoodsFn: bindActionCreators(actionCreators, dispatch),
+		publishGoodsImgFn: bindActionCreators(actionCreators, dispatch),
 	};
 };
 

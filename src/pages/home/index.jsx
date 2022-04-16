@@ -10,6 +10,7 @@ import { actionCreators as getGoodsInfoActionCreators } from './store';
 import axios from '../../utils/request';
 // 导航
 import logo from '../../assets/home_logo.jpg';
+import throttle from '../../utils/throttle'
 const { Dragger } = Upload;
 const Home = (props) => {
 	const { goodsInfoFn,searchGoodsFn } = props;
@@ -24,6 +25,15 @@ const Home = (props) => {
 	const getGoodsList = async () => {
 		const { data } = await goodsInfoFn.getGoodsInfo();
 		console.log('data', data);
+		// console.log(JSON.parse(JSON.stringify(data.localPath)));
+		// if(data && data.code === 200) {
+		// 	const newData = data.data.map(item => {
+		// 		item.goods_img = JSON.parse(JSON.stringify(data.localPath))+ 'aIKAJUTReZ9LXJDKjzgKIKwP.png'
+		// 	})
+		// 	console.log(newData);
+		// }
+
+		// console.log(data.localPath+data.data);
 		setGoodsList(data.data);
 	};
 
@@ -81,6 +91,7 @@ const searchGoods = async () => {
 		setGoodsList(data.data);
 	}
 }
+const throttleSearchGoods = throttle(searchGoods,1000)
 
 console.log('goodsList',goodsList);
 
@@ -113,7 +124,7 @@ console.log('goodsList',goodsList);
 					<div className={styles.search_search_box}>
 						<div className={styles.block}>
 							<input val={searchInfo} onChange={onSearchEdit} />
-							<button onClick={searchGoods}>
+							<button onClick={throttleSearchGoods}>
 								<SearchOutlined />
 							</button>
 						</div>
@@ -150,6 +161,7 @@ console.log('goodsList',goodsList);
 													<p className={styles.product_info__title}>
 														{item.goods_name}
 													</p>
+													<span className={styles.browse_num}>浏览量: {item.browse_num}</span>
 													<div className={styles.product_info__desc}>
 														<p className={styles.quality}>
 															{
