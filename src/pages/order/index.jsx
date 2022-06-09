@@ -1,14 +1,14 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import {
-	InputNumber,
 	Table,
 	Menu,
-	Divider,
 	Popconfirm,
-	List,
-	Avatar,
 	message,
 	Button,
+	Modal,
+	Form,
+	Select,
+	Space,
 } from 'antd';
 import styles from './index.module.less';
 import empty from '../../assets/empty.png';
@@ -16,14 +16,19 @@ import moment from 'moment';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
+import { WechatOutlined, AlipayOutlined } from '@ant-design/icons';
 
 const Order = (props) => {
-	const { user, getOrderFn,deleteOrderFn } = props;
-
+	const { user, getOrderFn, deleteOrderFn } = props;
+	const [formObject] = Form.useForm();
+	const { Option } = Select;
 	const [cartStatus, setCartStatus] = useState(true);
 	const [orderList, setOrderList] = useState([]);
 	const [orderDetailList, setOrderDetailList] = useState([]);
-
+	const [payVisible, setPayVisible] = useState({
+		visible:false,
+		price:0
+	});
 	const getOrder = async () => {
 		const { data } = await getOrderFn.getOrder({ username: user.username });
 		if (data && data.status === 200) {
@@ -69,22 +74,23 @@ const Order = (props) => {
 	};
 
 	const deleteOrder = async (id) => {
-
 		const { data } = await deleteOrderFn.deleteOrder({ id });
-
-
 		if (data && data.status === 200) {
 			setTimeout(() => {
 				message.success(data.msg);
 			}, 500);
+			getOrder();
 		}
 	};
 
-	const payPages = () => {
+	const payPages = (id) => {
+		console.log(id);
+		message.success('正在跳转到支付页面');
+	};
+	const PayCancel = () => {
+		setPayVisible({visible:false,price:0});
+	};
 
-		message.success('正在跳转到支付页面')
-	}
-	
 	useEffect(() => {
 		getOrder();
 	}, []);
@@ -121,40 +127,69 @@ const Order = (props) => {
 			render: (v) => `￥：${v}`,
 		},
 		{
+			title: '支付方式',
+			key: 'payment',
+			dataIndex: 'payment',
+			render: (v) => (v == 'offline' ? '线下支付' : '线上支付'),
+		},
+		{
 			title: '状态',
-			key: `sum`,
-			dataIndex: `sum`,
-			render: () => `待支付`,
+			key: `status`,
+			dataIndex: `status`,
+			render: (v) => (v ? '待发货' : '待支付'),
 		},
 		{
 			title: '操作',
-			key: 'id',
-			dataIndex: 'id',
+			key: 'operate',
 			align: 'center',
 			width: 180,
-			render: (id) => (
+			render: (row) => (
 				<>
-					<Button
-						type="primary"
-						style={{ padding: '4px 8px', marginRight: 20 }}
-						onClick={() => {
-							payPages(id);
-						}}
-					>
-						支付
-					</Button>
-					<Popconfirm
-						title="是否删除该商品？"
-						onConfirm={() => {
-							deleteOrder(id);
-						}}
-						okText="确定"
-						cancelText="取消"
-					>
-						<Button type="danger" style={{ padding: '4px 8px' }}>
-							删除
+					{row.payment == 'offline' ? null : (
+						<Button
+							type="primary"
+							style={{ padding: '4px 8px', marginRight: 20 }}
+							onClick={() => {
+								// payPages(row.id);
+								setPayVisible({visible:true,price:row.sum});
+							}}
+						>
+							支付
 						</Button>
-					</Popconfirm>
+					)}
+					{row.payment == 'offline' ? (
+						<Popconfirm
+							title="是否取消该订单？"
+							onConfirm={() => {
+								deleteOrder(row.id);
+							}}
+							okText="确定"
+							cancelText="取消"
+						>
+							<Button
+								type="danger"
+								style={{ padding: '4px 8px' }}
+							>
+								取消订单
+							</Button>
+						</Popconfirm>
+					) : (
+						<Popconfirm
+							title="是否取消该订单？"
+							onConfirm={() => {
+								deleteOrder(row.id);
+							}}
+							okText="确定"
+							cancelText="取消"
+						>
+							<Button
+								type="danger"
+								style={{ padding: '4px 8px' }}
+							>
+								取消订单
+							</Button>
+						</Popconfirm>
+					)}
 				</>
 			),
 		},
@@ -204,6 +239,66 @@ const Order = (props) => {
 					</div>
 				)}
 			</div>
+			<Modal
+				title="在线支付"
+				visible={payVisible.visible}
+				// onOk={PayOk}
+				onCancel={PayCancel}
+				footer={null}
+			>
+				<div style={{ width: '100%',height:50 }}>
+					支付金额：
+					<span style={{ fontSize: 26, color: '#ed7b11' }}>
+						￥{payVisible.price}
+					</span>
+				</div>
+
+				<Space size={10} style={{margin:'20px 0 20px 0'}}>
+				支付方式:
+						<div style={{ width: 150,marginLeft:40 }}>
+							微信:
+							<Button
+								type="link"
+								style={{
+									backgroundColor: '#1BD66C',
+									width: 100,
+									height: 50,
+									fontSize: 24,
+									marginLeft:10
+								}}
+								onClick={() => {
+									message.loading('正在跳转到微信')
+								}}
+							>
+								<WechatOutlined style={{ color: '#ffffff' }} />
+							</Button>
+						</div>
+						<div >
+							支付宝:
+							<Button
+								type="link"
+								style={{
+									backgroundColor: '#00AAEE',
+									width: 100,
+									height: 50,
+									fontSize: 24,
+									marginLeft:10
+								}}
+								onClick={() => {
+									message.loading('正在跳转到支付宝')
+								}}
+							>
+								<AlipayOutlined style={{ color: '#ffffff' }} />
+							</Button>
+						</div>
+			
+			
+				</Space>
+
+				
+
+				
+			</Modal>
 		</div>
 	);
 };

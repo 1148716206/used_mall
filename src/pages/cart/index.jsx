@@ -17,6 +17,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators } from './store';
 import debounce from '../../utils/debounce';
+import { indexOf } from 'lodash';
 
 const Cart = (props) => {
 	const {
@@ -75,29 +76,34 @@ const Cart = (props) => {
 				message.success(data.msg);
 			}, 500);
 		}
-		//防抖函数
-		//判断数量
 	};
 	const debounceChange = debounce(numberChange, 500);
 
-	const deleteGoods = async (goods_id) => {
-		const { data } = await deleteCartInfoFn.deleteCartInfo({ 
-			goods_id,
-			username:user.username
-		});
-		if (data && data.status === 200) {
-				message.success(data.msg);
-		}
-	};
-
 	const PayOk = async () => {
 		const userData = formObject.getFieldsValue();
-		const { data } = await addOrderFn.addOrder({goods_list:chooseGoodsList,...userData});
+		let newData={}
+		if(userData.payment == 'offline') {
+			newData = {
+				...userData,
+				status:1
+			}
+		} else {
+			newData = {
+				...userData,
+				status:0
+			}
+		}
+
+		const { data } = await addOrderFn.addOrder({goods_list:chooseGoodsList,...newData});
 		if (data && data.status === 200) {
-		
 			setTimeout(() => {
-				message.success(data.msg);
+				if(userData.payment == 'offline'){
+					message.success('购买成功，等商家发货')
+				}else {
+					message.success('正在跳转订单详情，去支付');
+				}
 			}, 500);
+			getUser();
 			setPayVisible(false);
 		}
 
@@ -110,6 +116,20 @@ const Cart = (props) => {
 	useEffect(() => {
 		getUser();
 	}, [numberStatus]);
+	const deleteGoods = async (goods_id) => {
+		const {data}  = await deleteCartInfoFn.deleteCartInfo({ 
+			goods_id,
+			username:user.username
+		});
+		console.log(data);
+		if (data && data.status === 200) {
+				message.success(data.msg);
+		}
+		setTimeout(() => {
+			getUser()
+		},500)
+
+	};
 
 	const columns = [
 		{
@@ -228,7 +248,8 @@ const Cart = (props) => {
 								<Button
 									type="primary"
 									onClick={() => {
-										if(chooseGoodsList.length!==0) {
+		
+										if(chooseGoodsList !== null && chooseGoodsList.length !== 0) {
 											setPayVisible(true);
 										} else {
 											message.error('请选择商品')
@@ -322,9 +343,8 @@ const Cart = (props) => {
 						]}
 					>
 						<Select initialValue="" placeholder="请选择支付方式">
-							<Option value="Alipay">支付宝</Option>
-							<Option value="WeChatPay">微信支付</Option>
-							<Option value="CMB">招商银行</Option>
+							<Option value="online">线上支付</Option>
+							<Option value="offline">线下支付</Option>
 						</Select>
 					</Form.Item>
 				</Form>

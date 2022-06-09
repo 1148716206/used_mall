@@ -51,13 +51,13 @@ const Personal = (props) => {
 	const [formObject] = Form.useForm();
 
 	const personData = async () => {
-		console.log('sss');
-		console.log(userInfo.username);
 		const { data } = await getUserDataFn.getUserData(userInfo.username);
 
-	
 		if (data.status === 200) {
 			const userInfo = data.data[0];
+			if(userInfo.avatar){
+				setAvatar(null)
+			}
 			setUserInfo({
 				id: userInfo.id,
 				username: userInfo.username,
@@ -70,21 +70,24 @@ const Personal = (props) => {
 		}
 	};
 	const getAvatar = async () => {
-		const { data } = await getAvatarFn.getAvatar(userInfo.username);
-		setAvatar(
-			'data:image/png;base64,' +
-				btoa(
-					new Uint8Array(data).reduce(
-						(data, byte) => data + String.fromCharCode(byte),
-						''
+		const {data} = await getAvatarFn.getAvatar(userInfo.username);
+
+			setAvatar(
+				'data:image/png;base64,' +
+					btoa(
+						new Uint8Array(data).reduce(
+							(data, byte) => data + String.fromCharCode(byte),
+							''
+						)
 					)
-				)
-		);
+			);
+		
+		
 	};
 
 	useEffect(() => {
 		personData();
-		getAvatar();
+
 	}, []);
 
 	const changeGender = async (userInfo) => {
@@ -175,6 +178,7 @@ const Personal = (props) => {
 			// });
 		}
 	};
+console.log('avatar',avatar);
 
 
 	return (
@@ -191,7 +195,7 @@ const Personal = (props) => {
 						showUploadList={false}
 						// onChange={hasPicUpload}
 					>
-						<img role="presentation" src={avatar || user.avatar || robot} alt="" />
+						<img role="presentation" src={user.avatar || avatar || robot} alt="" />
 					</Dragger>
 				</div>
 				<div className={styles.info_list}>
@@ -223,12 +227,12 @@ const Personal = (props) => {
 					>
 						<div className={styles.title}>性别</div>
 						<div className={styles.name}>
-							{userInfo.gender === 0 ? '男' : '女'}
+							{userInfo.gender ? '男' : '女'}
 						</div>
 						<div className={styles.oprate}>
 							<Popconfirm
 								title={`是否更换性别为：${
-									userInfo.gender === 0 ? '女' : '男'
+									userInfo.gender ? '女' : '男'
 								}`}
 								onConfirm={() => {
 									changeGender(userInfo);

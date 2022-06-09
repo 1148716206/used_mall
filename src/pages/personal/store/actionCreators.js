@@ -15,8 +15,6 @@ export const getUserData = data => {
   }
 }
 export const getAvatar = data => {
-  console.log(data)
-
   return dispatch => {
     return axios.post('/api/personal/getAvatar', data,{responseType: 'arraybuffer'})
   }

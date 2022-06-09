@@ -72,8 +72,7 @@ const Pulish = (props) => {
 		console.log('data',data);
 		if(data.status === 200) {
 			setTimeout(() => {
-				message.success('发布成功，跳转至首页！');
-			
+				message.success('发布成功，待审核！');
 			}, 500);
 			setTimeout(() => {
 				window.location.href = '/'

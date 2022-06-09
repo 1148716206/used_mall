@@ -36,6 +36,7 @@ const Pulished = (props) => {
 				new_price: item.new_price,
 				goods_number: item.goods_number,
 				goods_name: item.goods_name,
+				status:item.status
 			}));
 			setPublishedGoodsList(cartData);
 		}
@@ -65,6 +66,7 @@ const Pulished = (props) => {
 			setTimeout(() => {
 				message.success(data.msg);
 			}, 500);
+			publishedGoods()
 		}
 	};
 
@@ -110,6 +112,12 @@ const Pulished = (props) => {
 					/>
 				</div>
 			),
+		},
+			{
+			title: '状态',
+			key: 'status',
+			dataIndex: 'status',
+			render: v => (v ? '已上架' : '待审核'),
 		},
 		{
 			title: '操作',

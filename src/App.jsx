@@ -28,7 +28,6 @@ export default class App extends Component {
 		} 
 	}
 	render() {
-		let AuthCart = Auth(<Cart/>)
 		return (
 			<Router>
         <Navigator/>

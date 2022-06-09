@@ -1,9 +1,8 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './index.module.less';
-import { Input, Button, Upload, Modal, message,Pagination,Empty   } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { SearchOutlined } from '@ant-design/icons';
+import { Input, Button, Upload, Modal, message,Pagination,Empty} from 'antd';
+import { PlusOutlined,SearchOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actionCreators as getGoodsInfoActionCreators } from './store';
@@ -82,20 +81,18 @@ const Home = (props) => {
 		setSearchInfo(val);
 };
 
-const searchGoods = async () => {
-
-	const {data} = await searchGoodsFn.searchGoods({
-		goods_name:searchInfo
-	});
-	if(data.status === 200) {
-		setGoodsList(data.data);
+	const searchGoods = async () => {
+		const {data} = await searchGoodsFn.searchGoods({
+			goods_name:searchInfo
+		});
+		if(data && data.status === 200) {
+			setGoodsList(data.data);
+		}
 	}
-}
-const throttleSearchGoods = throttle(searchGoods,1000)
 
-console.log('goodsList',goodsList);
+	const throttleSearchGoods = throttle(searchGoods,1000)
 
-	const toggleManagerInfoModal = (val) => {
+	const toggleManagerInfoModal = val => {
 		if (val) {
 			setManagerInfoModal({
 				...managerInfoModal,
@@ -203,7 +200,7 @@ console.log('goodsList',goodsList);
 						</div>
 					</div>
 					<div style={{float:"right",marginTop:20}}>
-					<Pagination defaultCurrent={1} total={15} />
+					<Pagination defaultCurrent={1} total={goodsList.length} />
 					</div>
 					{/* <Button
 						onClick={() => {
@@ -295,7 +292,7 @@ console.log('goodsList',goodsList);
 
 const mapStateToProps = (state) => {
 	return {
-		goodsInfoDate: state.goodsInfo,
+		goodsInfoData: state.goodsInfo,
 	};
 };
 

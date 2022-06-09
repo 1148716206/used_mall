@@ -109,7 +109,6 @@ const Detail = (props) => {
 			goods_name: goodsInfo.goods_name,
 			username: user.username,
 		};
-		console.log(addData);
 		const { data } = await addCartFn.addCart(addData);
 		if (data && data.status === 200) {
 			setTimeout(() => {
@@ -143,12 +142,12 @@ const Detail = (props) => {
 			username:user.username,
 			goods_id: parseInt(pramas.goods_id)
 		});
-		console.log('data',data);
 		if (data && data.status === 200) {
 		
 			setTimeout(() => {
-				message.success(data.msg);
+				message.success('留言成功');
 			}, 500);
+			getGoodsMessage();
 			setQuestionVisible(false);
 		}
 
@@ -283,7 +282,7 @@ const Detail = (props) => {
 									</div>
 									<div className={styles.time}>
 										{/* <span>{moment(item.createdAt).format('MM-DD HH:mm')}</span> */}
-										<span>2022-02-15 15:51</span>
+										<span>{item.create_time}</span>
 										<Popconfirm
 											title="确定要删除该留言吗？"
 											// onConfirm={() =>
@@ -302,11 +301,7 @@ const Detail = (props) => {
 						  ))
 						: null}
 				</ul>
-				<Pagination
-					style={{ position: 'absolute', right: 0, bottom: 10 }}
-					defaultCurrent={1}
-					total={15}
-				/>
+
 				{/* <div className={styles.modal_box_answers_content} >
 					<TextArea
 							style={{ height:200,backgroundColor:'#f7f7f7' }}
